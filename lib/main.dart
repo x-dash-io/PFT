@@ -1,5 +1,3 @@
-// lib/main.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -8,9 +6,11 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'auth_gate.dart';
 import 'firebase_options.dart';
 import 'helpers/notification_service.dart';
+import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/reports_screen.dart';
 import 'screens/profile_screen.dart';
+import 'theme/app_theme.dart';
 
 final NotificationService notificationService = NotificationService();
 
@@ -61,23 +61,7 @@ class PersonalFinanceTracker extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Personal Finance Tracker',
       themeMode: ThemeMode.light,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF4CAF50), // Green color
-          brightness: Brightness.light,
-        ),
-        primaryColor: const Color(0xFF4CAF50),
-        scaffoldBackgroundColor: Colors.white,
-        textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
-        useMaterial3: true,
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF4CAF50),
-            foregroundColor: Colors.white,
-            elevation: 0,
-          ),
-        ),
-      ),
+      theme: AppTheme.lightTheme,
       home: const AuthGate(),
     );
   }
@@ -112,14 +96,11 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onItemTapped,
-        
-        // --- Style Customizations ---
-        height: 70,
-        indicatorColor: Theme.of(context).colorScheme.primaryContainer,
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: AppColors.white,
+        height: 72,
+        elevation: 0,
+        indicatorColor: AppColors.primary.withOpacity(0.1),
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        // --------------------------
-
         destinations: const <NavigationDestination>[
           NavigationDestination(
             icon: Icon(Icons.account_balance_wallet_outlined),

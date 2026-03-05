@@ -7,7 +7,6 @@ import '../helpers/dialog_helper.dart';
 import '../helpers/notification_service.dart';
 import '../models/bill.dart';
 import '../models/transaction.dart' as model;
-import '../theme/app_theme.dart';
 import 'add_transaction_screen.dart';
 import 'all_transactions_screen.dart';
 import 'add_bill_screen.dart';
@@ -149,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
       title: 'Delete Bill',
       message: 'Are you sure you want to delete "${bill.name}"? This action cannot be undone.',
       confirmText: 'Delete',
-      confirmColor: AppColors.error,
+      confirmColor: Colors.red,
     );
 
     if (confirm == true && mounted) {
@@ -174,13 +173,13 @@ class _HomeScreenState extends State<HomeScreen> {
   
   ({IconData icon, Color color}) _getBillStyling(String billName) {
     final name = billName.toLowerCase();
-    if (name.contains('rent')) return (icon: Icons.house_outlined, color: AppColors.warning);
-    if (name.contains('netflix') || name.contains('movie')) return (icon: Icons.movie_outlined, color: AppColors.error);
-    if (name.contains('wifi') || name.contains('internet')) return (icon: Icons.wifi, color: AppColors.info);
-    if (name.contains('electricity') || name.contains('power')) return (icon: Icons.lightbulb_outline, color: AppColors.warning);
-    if (name.contains('water')) return (icon: Icons.water_drop_outlined, color: AppColors.secondary);
-    if (name.contains('loan') || name.contains('debt')) return (icon: Icons.credit_card_outlined, color: AppColors.tertiary);
-    return (icon: Icons.receipt_long_outlined, color: AppColors.neutralMedium);
+    if (name.contains('rent')) return (icon: Icons.house_outlined, color: Colors.orange);
+    if (name.contains('netflix') || name.contains('movie')) return (icon: Icons.movie_outlined, color: Colors.red);
+    if (name.contains('wifi') || name.contains('internet')) return (icon: Icons.wifi, color: Colors.blue);
+    if (name.contains('electricity') || name.contains('power')) return (icon: Icons.lightbulb_outline, color: Colors.yellow.shade700);
+    if (name.contains('water')) return (icon: Icons.water_drop_outlined, color: Colors.lightBlue);
+    if (name.contains('loan') || name.contains('debt')) return (icon: Icons.credit_card_outlined, color: Colors.purple);
+    return (icon: Icons.receipt_long_outlined, color: Colors.grey);
   }
 
   ({String text, Color color}) _getBillStatus(DateTime dueDate) {
@@ -190,13 +189,13 @@ class _HomeScreenState extends State<HomeScreen> {
     final daysLeft = dueDay.difference(today).inDays;
 
     if (daysLeft < 0) {
-      return (text: 'Overdue', color: AppColors.error);
+      return (text: 'Overdue', color: Colors.red);
     } else if (daysLeft == 0) {
-      return (text: 'Due Today', color: AppColors.warning);
+      return (text: 'Due Today', color: Colors.orange);
     } else if (daysLeft <= 7) {
-      return (text: 'Due in $daysLeft days', color: AppColors.warning);
+      return (text: 'Due in $daysLeft days', color: Colors.yellow.shade800);
     } else {
-      return (text: '$daysLeft days left', color: AppColors.neutralMedium);
+      return (text: '$daysLeft days left', color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7));
     }
   }
   
@@ -225,25 +224,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-        Padding(
-                          padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                _getGreeting(),
-                                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                  color: const Color(0xFF6B7280),
-                                  fontWeight: FontWeight.w500,
-                                ),
+                                '${_getGreeting()} 👋',
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
-                              const SizedBox(height: 4),
                               Text(
                                 currentUser?.displayName ?? 'User',
-                                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                  color: const Color(0xFF1A1A2E),
-                                ),
+                                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
                             ],
                           ),
@@ -253,51 +247,27 @@ class _HomeScreenState extends State<HomeScreen> {
                             padding: EdgeInsets.zero,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                                 child: Column(
                                   children: [
-                                    SummaryCard(
-                                      title: 'Total Income', 
-                                      amount: _totalIncome, 
-                                      icon: Icons.trending_up, 
-                                      color: const Color(0xFF10B981), 
-                                      currencySymbol: _currencySymbol
-                                    ),
+                                    SummaryCard(title: 'Total Income', amount: _totalIncome, icon: Icons.trending_up, color: const Color(0xFF4CAF50), currencySymbol: _currencySymbol),
                                     const SizedBox(height: 12),
-                                    SummaryCard(
-                                      title: 'Total Expenses', 
-                                      amount: _totalExpenses, 
-                                      icon: Icons.trending_down, 
-                                      color: const Color(0xFFEF4444), 
-                                      currencySymbol: _currencySymbol
-                                    ),
+                                    SummaryCard(title: 'Total Expenses', amount: _totalExpenses, icon: Icons.trending_down, color: Colors.red, currencySymbol: _currencySymbol),
                                     const SizedBox(height: 12),
-                                    SummaryCard(
-                                      title: 'Balance', 
-                                      amount: _balance, 
-                                      icon: Icons.account_balance, 
-                                      color: _balance >= 0 ? const Color(0xFF1F6FEB) : const Color(0xFFFF9F1C), 
-                                      currencySymbol: _currencySymbol
-                                    ),
+                                    SummaryCard(title: 'Balance', amount: _balance, icon: Icons.account_balance, color: _balance >= 0 ? const Color(0xFF4CAF50) : Colors.orange, currencySymbol: _currencySymbol),
                                   ],
                                 ),
                               ),
                               _buildUpcomingBillsSection(currentUser),
                               Padding(
-                                padding: const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 12),
+                                padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(
-                                          'Recent Transactions',
-                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                            fontWeight: FontWeight.w700,
-                                            color: const Color(0xFF1A1A2E),
-                                          ),
-                                        ),
+                                        const Text('Recent Transactions', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                                         TextButton(
                                           onPressed: () {
                                             if (currentUser == null) return;
@@ -306,29 +276,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                               MaterialPageRoute(builder: (context) => const AllTransactionsScreen()),
                                             ).then((_) => _refreshData());
                                           },
-                                          child: Text(
-                                            'See All',
-                                            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                              color: const Color(0xFF1F6FEB),
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
+                                          child: const Text('See All'),
                                         )
                                       ],
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
+                                      padding: const EdgeInsets.only(top: 4.0),
                                       child: Row(
                                         children: [
-                                          Icon(Icons.info_outline, size: 14, color: const Color(0xFF9CA3AF)),
-                                          const SizedBox(width: 6),
+                                          Icon(Icons.info_outline, size: 14, color: Colors.grey.shade600),
+                                          const SizedBox(width: 4),
                                           Text(
                                             'Swipe left to delete, or right to edit',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: const Color(0xFF9CA3AF),
-                                              fontFamily: 'Poppins',
-                                            ),
+                                            style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                                           ),
                                         ],
                                       ),
@@ -355,18 +315,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 await _refreshData();
               }
             },
-            backgroundColor: const Color(0xFF1F6FEB),
+            backgroundColor: const Color(0xFF4CAF50),
             foregroundColor: Colors.white,
-            elevation: 4,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            label: Text(
-              'Add Transaction',
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            label: const Text('Add Transaction'),
             icon: const Icon(Icons.add),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           ),
         );
       },
@@ -378,47 +331,32 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Upcoming Bills',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xFF1A1A2E),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const AddBillScreen()))
-                  .then((_) {
-                    if (currentUser != null) {
-                      _refreshData();
-                    }
-                  });
-                },
-                child: Text(
-                  'Add Bill',
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: const Color(0xFF1F6FEB),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
+              const Text('Upcoming Bills', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              TextButton(onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const AddBillScreen()))
+                .then((_) {
+                  if (currentUser != null) {
+                    _refreshData();
+                  }
+                });
+              }, child: const Text('Add Bill')),
             ],
           ),
         ),
         _bills.isEmpty
             ? const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
                 child: Center(child: Text('No upcoming bills.')),
               )
             : SizedBox(
                 height: 180,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
                   itemCount: _bills.length,
                   itemBuilder: (context, index) {
                     final bill = _bills[index];
@@ -428,13 +366,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     return SizedBox(
                       width: 170,
                       child: Card(
-                        elevation: 0,
+                        elevation: 2,
                         shape: RoundedRectangleBorder(
-                          side: BorderSide(color: status.color.withOpacity(0.2), width: 1.5),
+                          side: BorderSide(color: status.color.withOpacity(0.3), width: 1.5),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(14.0),
+                          padding: const EdgeInsets.all(12.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
@@ -639,16 +577,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildTransactionList(User? currentUser) {
     if (_transactions.isEmpty) {
-      return Center(
-        heightFactor: 5,
-        child: Text(
-          'No transactions yet. Add one!',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: const Color(0xFF9CA3AF),
-            fontFamily: 'Poppins',
-          ),
-        ),
-      );
+      return const Center(heightFactor: 5, child: Text('No transactions yet. Add one!'));
     }
     
     final currencyFormatter = NumberFormat.currency(locale: 'en_US', symbol: '');
@@ -661,7 +590,7 @@ class _HomeScreenState extends State<HomeScreen> {
       itemBuilder: (context, index) {
         final transaction = recentTransactions[index];
         final isIncome = transaction.type == 'income';
-        final amountColor = isIncome ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+        final amountColor = isIncome ? const Color(0xFF4CAF50) : Colors.red;
         final amountPrefix = isIncome ? '+' : '-';
 
         return Dismissible(
@@ -682,7 +611,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: 'Confirm Deletion',
                 message: 'Are you sure you want to delete this transaction?',
                 confirmText: 'Delete',
-                confirmColor: const Color(0xFFEF4444),
+                confirmColor: Colors.red,
               );
             }
           },
@@ -693,13 +622,13 @@ class _HomeScreenState extends State<HomeScreen> {
             }
           },
           background: Container(
-            color: const Color(0xFF1F6FEB),
+            color: Colors.blue,
             padding: const EdgeInsets.symmetric(horizontal: 20),
             alignment: Alignment.centerLeft,
             child: const Icon(Icons.edit, color: Colors.white),
           ),
           secondaryBackground: Container(
-            color: const Color(0xFFEF4444),
+            color: Colors.red,
             padding: const EdgeInsets.symmetric(horizontal: 20),
             alignment: Alignment.centerRight,
             child: const Icon(Icons.delete, color: Colors.white),
@@ -707,11 +636,8 @@ class _HomeScreenState extends State<HomeScreen> {
           
           child: Card(
             margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: const Color(0xFFE5E7EB), width: 1),
-            ),
+            elevation: 1,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               leading: Container(
@@ -720,44 +646,28 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: amountColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
-                  isIncome ? Icons.arrow_downward : Icons.arrow_upward,
-                  color: amountColor,
-                  size: 20,
-                ),
+                child: Icon(isIncome ? Icons.arrow_downward : Icons.arrow_upward, color: amountColor, size: 20),
               ),
               title: Text(
                 transaction.description.isNotEmpty ? transaction.description : transaction.type.capitalize(),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Poppins',
-                ),
+                style: const TextStyle(fontWeight: FontWeight.w500),
               ),
               subtitle: Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
                   transaction.date.split('T')[0],
-                  style: TextStyle(
-                    color: const Color(0xFF9CA3AF),
-                    fontSize: 12,
-                    fontFamily: 'Poppins',
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12),
                   ),
-                ),
               ),
               trailing: ConstrainedBox(
                 constraints: BoxConstraints(
                   maxWidth: MediaQuery.of(context).size.width * 0.3,
                 ),
                 child: Text(
-                  '$amountPrefix$_currencySymbol ${currencyFormatter.format(transaction.amount)}',
-                  style: TextStyle(
-                    color: amountColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    fontFamily: 'Poppins',
-                  ),
+                '$amountPrefix$_currencySymbol ${currencyFormatter.format(transaction.amount)}',
+                  style: TextStyle(color: amountColor, fontWeight: FontWeight.bold, fontSize: 16),
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.end,
                 ),
@@ -791,11 +701,8 @@ class SummaryCard extends StatelessWidget {
     final currencyFormatter = NumberFormat.currency(locale: 'en_US', symbol: '');
 
     return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: const Color(0xFFE5E7EB), width: 1),
-      ),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -804,8 +711,8 @@ class SummaryCard extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              color.withOpacity(0.08),
-              color.withOpacity(0.03),
+              color.withOpacity(0.1),
+              color.withOpacity(0.05),
             ],
           ),
         ),
@@ -814,7 +721,7 @@ class SummaryCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.15),
+                color: color.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: color, size: 28),
@@ -827,20 +734,18 @@ class SummaryCard extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 13,
-                      color: const Color(0xFF6B7280),
+                      fontSize: 14,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w500,
-                      fontFamily: 'Poppins',
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
                   Text(
-                    '$currencySymbol ${currencyFormatter.format(amount)}',
+          '$currencySymbol ${currencyFormatter.format(amount)}',
                     style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: color,
-                      fontFamily: 'Poppins',
+                      fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: color,
                     ),
                   ),
                 ],
