@@ -151,12 +151,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     // Set status bar style
     SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
+      SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.light,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
       ),
     );
 
@@ -214,9 +216,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             borderRadius: BorderRadius.circular(16),
                           ),
                           elevation: 4,
-                          shadowColor: AppColors.primary.withOpacity(0.4),
+                          shadowColor: AppColors.primary.withValues(alpha: 0.4),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Get Started',
                           style: TextStyle(
                             fontSize: 18,
@@ -229,7 +231,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     const SizedBox(height: 12),
                     TextButton(
                       onPressed: _navigateToLogin,
-                      child: const Text(
+                      child: Text(
                         'I already have an account',
                         style: TextStyle(
                           fontSize: 15,
@@ -261,7 +263,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
+            color: AppColors.primary.withValues(alpha: 0.3),
             blurRadius: 30,
             offset: const Offset(0, 15),
             spreadRadius: 0,
@@ -274,17 +276,17 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(
+            child: Icon(
               AppIcons.account_balance_wallet_rounded,
               color: Colors.white,
               size: 40,
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             'Take Control of\nYour Finances',
             style: TextStyle(
               color: Colors.white,
@@ -298,7 +300,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           Text(
             'Track expenses, manage budgets, and achieve your financial goals with our intuitive personal finance tracker.',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.95),
+              color: Colors.white.withValues(alpha: 0.95),
               fontSize: 16,
               height: 1.5,
               fontWeight: FontWeight.w500,
@@ -309,12 +311,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             spacing: 10,
             runSpacing: 10,
             children: [
+              _buildStatBadge(AppIcons.trending_up, 'Smart',
+                  Colors.white.withValues(alpha: 0.2)),
+              _buildStatBadge(AppIcons.security, 'Secure',
+                  Colors.white.withValues(alpha: 0.2)),
               _buildStatBadge(
-                  AppIcons.trending_up, 'Smart', Colors.white.withOpacity(0.2)),
-              _buildStatBadge(
-                  AppIcons.security, 'Secure', Colors.white.withOpacity(0.2)),
-              _buildStatBadge(
-                  AppIcons.sync, 'Synced', Colors.white.withOpacity(0.2)),
+                  AppIcons.sync, 'Synced', Colors.white.withValues(alpha: 0.2)),
             ],
           ),
         ],
@@ -336,7 +338,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           const SizedBox(width: 6),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
               fontSize: 12,
               fontWeight: FontWeight.w600,
@@ -351,12 +353,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Everything you need',
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w700,
-            color: Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
             letterSpacing: -0.3,
           ),
         ),
@@ -365,7 +367,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           'Powerful features to manage your money',
           style: TextStyle(
             fontSize: 14,
-            color: Colors.grey[600],
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -392,13 +394,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              AppColors.primary.withOpacity(0.1),
-                              AppColors.primary.withOpacity(0.05),
+                              AppColors.primary.withValues(alpha: 0.1),
+                              AppColors.primary.withValues(alpha: 0.05),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: AppColors.primary.withOpacity(0.2),
+                            color: AppColors.primary.withValues(alpha: 0.2),
                             width: 1.5,
                           ),
                         ),
@@ -413,10 +415,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             const SizedBox(width: 8),
                             Text(
                               text,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.black87,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           ],
@@ -456,12 +458,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Why choose us?',
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w700,
-            color: Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
             letterSpacing: -0.3,
           ),
         ),
@@ -470,7 +472,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           'Discover what makes us different',
           style: TextStyle(
             fontSize: 14,
-            color: Colors.grey[600],
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -502,23 +504,26 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        card.color.withOpacity(0.1),
-                        card.color.withOpacity(0.05),
+                        card.color.withValues(alpha: 0.1),
+                        card.color.withValues(alpha: 0.05),
                         Colors.white,
                       ],
                     ),
                     borderRadius: BorderRadius.circular(28),
                     border: Border.all(
                       color: isActive
-                          ? card.color.withOpacity(0.3)
-                          : Colors.grey[200]!,
+                          ? card.color.withValues(alpha: 0.3)
+                          : Theme.of(context)
+                              .colorScheme
+                              .outlineVariant
+                              .withValues(alpha: 0.7),
                       width: isActive ? 2 : 1,
                     ),
                     boxShadow: [
                       BoxShadow(
                         color: isActive
-                            ? card.color.withOpacity(0.2)
-                            : Colors.black12.withOpacity(0.05),
+                            ? card.color.withValues(alpha: 0.2)
+                            : Colors.black12.withValues(alpha: 0.05),
                         blurRadius: isActive ? 20 : 12,
                         offset: Offset(0, isActive ? 12 : 6),
                         spreadRadius: isActive ? 2 : 0,
@@ -531,11 +536,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: card.color.withOpacity(0.15),
+                          color: card.color.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: card.color.withOpacity(0.2),
+                              color: card.color.withValues(alpha: 0.2),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
                             ),
@@ -553,7 +558,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
-                          color: Colors.black87,
+                          color: Theme.of(context).colorScheme.onSurface,
                           letterSpacing: -0.3,
                         ),
                       ),
@@ -564,7 +569,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           style: TextStyle(
                             fontSize: 15,
                             height: 1.5,
-                            color: Colors.grey[700],
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.w500,
                           ),
                           maxLines: 3,
@@ -600,13 +606,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   height: 8,
                   width: isActive ? 40 : 8,
                   decoration: BoxDecoration(
-                    color:
-                        isActive ? _highlights[index].color : Colors.grey[300],
+                    color: isActive
+                        ? _highlights[index].color
+                        : Theme.of(context).colorScheme.outlineVariant,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: isActive
                         ? [
                             BoxShadow(
-                              color: _highlights[index].color.withOpacity(0.5),
+                              color: _highlights[index]
+                                  .color
+                                  .withValues(alpha: 0.5),
                               blurRadius: 8,
                               spreadRadius: 2,
                             ),
@@ -630,12 +639,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Colors.grey[50]!,
+            Theme.of(context).colorScheme.surfaceContainerLowest!,
             Colors.white,
           ],
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(
+            color: Theme.of(context)
+                .colorScheme
+                .outlineVariant
+                .withValues(alpha: 0.7)),
       ),
       child: Wrap(
         spacing: 22,
@@ -657,10 +670,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         const SizedBox(height: 8),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 4),
@@ -668,7 +681,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           label,
           style: TextStyle(
             fontSize: 12,
-            color: Colors.grey[600],
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w600,
           ),
         ),

@@ -3,7 +3,10 @@ import 'package:personal_finance_tracker/theme/app_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import '../auth_gate.dart';
+import '../helpers/google_auth_helper.dart';
 import '../theme/app_theme.dart';
+import '../widgets/google_auth_button.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -24,6 +27,7 @@ class _SignUpScreenState extends State<SignUpScreen>
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
   bool _isLoading = false;
+  bool _isGoogleLoading = false;
   bool _agreeToTerms = false;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -115,6 +119,78 @@ class _SignUpScreenState extends State<SignUpScreen>
     }
   }
 
+  Future<void> _signUpWithGoogle() async {
+    if (!_agreeToTerms) {
+      Fluttertoast.showToast(
+        msg: 'Please agree to the terms & policy',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      return;
+    }
+
+    if (_isLoading || _isGoogleLoading) {
+      return;
+    }
+
+    setState(() {
+      _isGoogleLoading = true;
+    });
+
+    try {
+      final credential = await GoogleAuthHelper.signInWithGoogle();
+      if (credential == null) {
+        Fluttertoast.showToast(
+          msg: 'Google sign in was cancelled.',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+        );
+        return;
+      }
+
+      if (_nameController.text.trim().isNotEmpty &&
+          (credential.additionalUserInfo?.isNewUser ?? false)) {
+        await credential.user?.updateDisplayName(_nameController.text.trim());
+      }
+
+      Fluttertoast.showToast(msg: 'Signed in with Google successfully!');
+
+      if (!mounted) return;
+
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const AuthGate()),
+        (route) => false,
+      );
+    } on FirebaseAuthException catch (e) {
+      Fluttertoast.showToast(
+        msg: GoogleAuthHelper.mapFirebaseAuthError(e),
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: 'Unable to continue with Google: $e',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isGoogleLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -146,12 +222,14 @@ class _SignUpScreenState extends State<SignUpScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     // Set status bar style
     SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
+      SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.light,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
       ),
     );
 
@@ -171,11 +249,12 @@ class _SignUpScreenState extends State<SignUpScreen>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: const Icon(AppIcons.arrow_back_rounded,
-                          color: Colors.black87),
+                      icon: Icon(AppIcons.arrow_back_rounded,
+                          color: Theme.of(context).colorScheme.onSurface),
                       onPressed: () => Navigator.pop(context),
                       style: IconButton.styleFrom(
-                        backgroundColor: Colors.grey[100],
+                        backgroundColor:
+                            Theme.of(context).colorScheme.surfaceContainerLow,
                         padding: const EdgeInsets.all(12),
                       ),
                     ),
@@ -193,7 +272,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                           borderRadius: BorderRadius.circular(18),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withOpacity(0.3),
+                              color: AppColors.primary.withValues(alpha: 0.3),
                               blurRadius: 12,
                               offset: const Offset(0, 6),
                             ),
@@ -218,13 +297,13 @@ class _SignUpScreenState extends State<SignUpScreen>
                     position: _slideAnimation,
                     child: Column(
                       children: [
-                        const Text(
+                        Text(
                           'Create Account',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 32,
                             fontWeight: FontWeight.w800,
-                            color: Colors.black87,
+                            color: Theme.of(context).colorScheme.onSurface,
                             letterSpacing: -0.5,
                           ),
                         ),
@@ -234,7 +313,8 @@ class _SignUpScreenState extends State<SignUpScreen>
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.grey[600],
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -249,12 +329,12 @@ class _SignUpScreenState extends State<SignUpScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Full Name',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: Theme.of(context).colorScheme.onSurface,
                           letterSpacing: 0.3,
                         ),
                       ),
@@ -262,21 +342,28 @@ class _SignUpScreenState extends State<SignUpScreen>
                       TextFormField(
                         controller: _nameController,
                         keyboardType: TextInputType.name,
-                        style: const TextStyle(
-                            color: Colors.black87, fontSize: 16),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 16),
                         decoration: InputDecoration(
                           hintText: 'Enter your full name',
-                          hintStyle: TextStyle(color: Colors.grey[400]),
+                          hintStyle: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant
+                                  .withValues(alpha: 0.7)),
                           filled: true,
-                          fillColor: Colors.grey[50],
+                          fillColor: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerLowest,
                           prefixIcon: Container(
                             margin: const EdgeInsets.all(12),
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.1),
+                              color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               AppIcons.person_outline,
                               color: AppColors.primary,
                               size: 20,
@@ -284,11 +371,17 @@ class _SignUpScreenState extends State<SignUpScreen>
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
+                            borderSide: BorderSide(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outlineVariant),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
+                            borderSide: BorderSide(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outlineVariant),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -319,12 +412,12 @@ class _SignUpScreenState extends State<SignUpScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Email',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: Theme.of(context).colorScheme.onSurface,
                           letterSpacing: 0.3,
                         ),
                       ),
@@ -332,21 +425,28 @@ class _SignUpScreenState extends State<SignUpScreen>
                       TextFormField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
-                        style: const TextStyle(
-                            color: Colors.black87, fontSize: 16),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 16),
                         decoration: InputDecoration(
                           hintText: 'Enter your email address',
-                          hintStyle: TextStyle(color: Colors.grey[400]),
+                          hintStyle: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant
+                                  .withValues(alpha: 0.7)),
                           filled: true,
-                          fillColor: Colors.grey[50],
+                          fillColor: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerLowest,
                           prefixIcon: Container(
                             margin: const EdgeInsets.all(12),
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.1),
+                              color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               AppIcons.email_outlined,
                               color: AppColors.primary,
                               size: 20,
@@ -354,11 +454,17 @@ class _SignUpScreenState extends State<SignUpScreen>
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
+                            borderSide: BorderSide(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outlineVariant),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
+                            borderSide: BorderSide(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outlineVariant),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -392,12 +498,12 @@ class _SignUpScreenState extends State<SignUpScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Password',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: Theme.of(context).colorScheme.onSurface,
                           letterSpacing: 0.3,
                         ),
                       ),
@@ -405,21 +511,28 @@ class _SignUpScreenState extends State<SignUpScreen>
                       TextFormField(
                         controller: _passwordController,
                         obscureText: !_isPasswordVisible,
-                        style: const TextStyle(
-                            color: Colors.black87, fontSize: 16),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 16),
                         decoration: InputDecoration(
                           hintText: 'Create a strong password',
-                          hintStyle: TextStyle(color: Colors.grey[400]),
+                          hintStyle: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant
+                                  .withValues(alpha: 0.7)),
                           filled: true,
-                          fillColor: Colors.grey[50],
+                          fillColor: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerLowest,
                           prefixIcon: Container(
                             margin: const EdgeInsets.all(12),
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.1),
+                              color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               AppIcons.lock_outline,
                               color: AppColors.primary,
                               size: 20,
@@ -427,11 +540,17 @@ class _SignUpScreenState extends State<SignUpScreen>
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
+                            borderSide: BorderSide(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outlineVariant),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
+                            borderSide: BorderSide(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outlineVariant),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -449,7 +568,9 @@ class _SignUpScreenState extends State<SignUpScreen>
                               _isPasswordVisible
                                   ? AppIcons.visibility_off_rounded
                                   : AppIcons.visibility_rounded,
-                              color: Colors.grey[600],
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                             onPressed: () {
                               setState(() {
@@ -478,12 +599,12 @@ class _SignUpScreenState extends State<SignUpScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Confirm Password',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: Theme.of(context).colorScheme.onSurface,
                           letterSpacing: 0.3,
                         ),
                       ),
@@ -491,21 +612,28 @@ class _SignUpScreenState extends State<SignUpScreen>
                       TextFormField(
                         controller: _confirmPasswordController,
                         obscureText: !_isConfirmPasswordVisible,
-                        style: const TextStyle(
-                            color: Colors.black87, fontSize: 16),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 16),
                         decoration: InputDecoration(
                           hintText: 'Re-enter your password',
-                          hintStyle: TextStyle(color: Colors.grey[400]),
+                          hintStyle: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant
+                                  .withValues(alpha: 0.7)),
                           filled: true,
-                          fillColor: Colors.grey[50],
+                          fillColor: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerLowest,
                           prefixIcon: Container(
                             margin: const EdgeInsets.all(12),
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.1),
+                              color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               AppIcons.lock_outline,
                               color: AppColors.primary,
                               size: 20,
@@ -513,11 +641,17 @@ class _SignUpScreenState extends State<SignUpScreen>
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
+                            borderSide: BorderSide(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outlineVariant),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
+                            borderSide: BorderSide(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outlineVariant),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -535,7 +669,9 @@ class _SignUpScreenState extends State<SignUpScreen>
                               _isConfirmPasswordVisible
                                   ? AppIcons.visibility_off_rounded
                                   : AppIcons.visibility_rounded,
-                              color: Colors.grey[600],
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                             onPressed: () {
                               setState(() {
@@ -565,9 +701,14 @@ class _SignUpScreenState extends State<SignUpScreen>
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.grey[50],
+                      color:
+                          Theme.of(context).colorScheme.surfaceContainerLowest,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey[200]!),
+                      border: Border.all(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .outlineVariant
+                              .withValues(alpha: 0.7)),
                     ),
                     child: Row(
                       children: [
@@ -594,7 +735,9 @@ class _SignUpScreenState extends State<SignUpScreen>
                               'I agree to the Terms & Privacy Policy',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.grey[700],
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -617,7 +760,8 @@ class _SignUpScreenState extends State<SignUpScreen>
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton(
-                        onPressed: _isLoading ? null : _signUp,
+                        onPressed:
+                            (_isLoading || _isGoogleLoading) ? null : _signUp,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
@@ -625,8 +769,9 @@ class _SignUpScreenState extends State<SignUpScreen>
                             borderRadius: BorderRadius.circular(16),
                           ),
                           elevation: 4,
-                          shadowColor: AppColors.primary.withOpacity(0.4),
-                          disabledBackgroundColor: Colors.grey[300],
+                          shadowColor: AppColors.primary.withValues(alpha: 0.4),
+                          disabledBackgroundColor:
+                              Theme.of(context).colorScheme.outlineVariant,
                         ),
                         child: _isLoading
                             ? const SizedBox(
@@ -658,6 +803,44 @@ class _SignUpScreenState extends State<SignUpScreen>
                   ),
                 ),
                 const SizedBox(height: 24),
+                FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Divider(
+                            color: Theme.of(context).colorScheme.outlineVariant,
+                            thickness: 1),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(
+                          'or continue with',
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Divider(
+                            color: Theme.of(context).colorScheme.outlineVariant,
+                            thickness: 1),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: GoogleAuthButton(
+                    label: 'Sign up with Google',
+                    isLoading: _isGoogleLoading,
+                    onPressed: _signUpWithGoogle,
+                  ),
+                ),
+                const SizedBox(height: 24),
                 // Sign In Link
                 FadeTransition(
                   opacity: _fadeAnimation,
@@ -668,13 +851,13 @@ class _SignUpScreenState extends State<SignUpScreen>
                         'Already have an account? ',
                         style: TextStyle(
                           fontSize: 15,
-                          color: Colors.grey[600],
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
-                        child: const Text(
+                        child: Text(
                           'Sign In',
                           style: TextStyle(
                             fontSize: 15,

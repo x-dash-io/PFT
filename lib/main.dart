@@ -58,17 +58,23 @@ class PersonalFinanceTracker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Set status bar style globally
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.light,
-      ),
-    );
-
     return Consumer<ThemeService>(
       builder: (context, themeService, _) {
+        final brightness = themeService.isDarkMode(context)
+            ? Brightness.dark
+            : Brightness.light;
+
+        // Keep status bar icons readable in both light and dark themes.
+        SystemChrome.setSystemUIOverlayStyle(
+          SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: brightness == Brightness.dark
+                ? Brightness.light
+                : Brightness.dark,
+            statusBarBrightness: brightness,
+          ),
+        );
+
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Ledgerlite',
@@ -114,7 +120,7 @@ class _MainScreenState extends State<MainScreen> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         height: 72,
         elevation: 0,
-        indicatorColor: AppColors.primary.withOpacity(0.14),
+        indicatorColor: AppColors.primary.withValues(alpha: 0.14),
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         destinations: const <NavigationDestination>[
           NavigationDestination(

@@ -26,6 +26,8 @@ dependencies:
   image_picker: ^1.1.2
   flutter_local_notifications: ^17.2.1
   url_launcher: ^6.3.0
+  google_sign_in: ^6.2.2
+  flutter_svg: ^2.0.10+1
   
   cloud_firestore: ^5.0.1
   fl_chart: ^0.68.0
@@ -46,6 +48,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/icons/google_logo.svg
+    - assets/icons/whatsapp_logo.svg
 
 flutter_launcher_icons:
   android: true

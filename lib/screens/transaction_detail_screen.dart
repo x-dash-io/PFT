@@ -174,13 +174,14 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(AppIcons.arrow_back, color: Colors.black87),
+          icon: Icon(AppIcons.arrow_back,
+              color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Edit Transaction',
           style: TextStyle(
-            color: Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
             fontWeight: FontWeight.bold,
             fontSize: 20,
           ),
@@ -201,7 +202,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
             )
           else
             IconButton(
-              icon: const Icon(AppIcons.delete_outline, color: Colors.red),
+              icon: Icon(AppIcons.delete_outline, color: Colors.red),
               onPressed: _isUpdating ? null : _deleteTransaction,
               tooltip: 'Delete Transaction',
             ),
@@ -217,7 +218,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
               Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
@@ -251,24 +252,29 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                 controller: _amountController,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
-                style: const TextStyle(
-                  color: Colors.black87,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
                 decoration: InputDecoration(
                   hintText: '0.00',
-                  hintStyle: TextStyle(color: Colors.grey[400]),
+                  hintStyle: TextStyle(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurfaceVariant
+                          .withValues(alpha: 0.7)),
                   filled: true,
-                  fillColor: Colors.grey[50],
+                  fillColor:
+                      Theme.of(context).colorScheme.surfaceContainerLowest,
                   prefixIcon: Container(
                     margin: const EdgeInsets.all(12),
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       AppIcons.attach_money,
                       color: AppColors.primary,
                       size: 24,
@@ -276,11 +282,13 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
+                    borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.outlineVariant),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
+                    borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.outlineVariant),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -323,9 +331,14 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                           return Container(
                             height: 60,
                             decoration: BoxDecoration(
-                              color: Colors.grey[50],
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerLowest,
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.grey[300]!),
+                              border: Border.all(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .outlineVariant),
                             ),
                             child: const Center(
                               child: SizedBox(
@@ -348,9 +361,14 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                           key: ValueKey(
                               'dropdown_${_transactionType}_${categories.length}'),
                           decoration: BoxDecoration(
-                            color: Colors.grey[50],
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerLowest,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.grey[300]!),
+                            border: Border.all(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outlineVariant),
                           ),
                           child: DropdownButtonFormField<int>(
                             value: dropdownValue,
@@ -368,7 +386,8 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                                 margin: const EdgeInsets.all(12),
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withOpacity(0.1),
+                                  color:
+                                      AppColors.primary.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Icon(
@@ -380,14 +399,18 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                                 ),
                               ),
                             ),
-                            style: const TextStyle(
-                              color: Colors.black87,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
                             hint: Text(
                               'Select category',
-                              style: TextStyle(color: Colors.grey[500]),
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant
+                                      .withValues(alpha: 0.8)),
                             ),
                             items: categories.map((category) {
                               IconData icon = AppIcons.label;
@@ -402,7 +425,10 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(icon,
-                                        size: 20, color: Colors.grey[700]),
+                                        size: 20,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant),
                                     const SizedBox(width: 12),
                                     Flexible(
                                       fit: FlexFit.loose,
@@ -432,12 +458,14 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                   const SizedBox(width: 12),
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey[50],
+                      color:
+                          Theme.of(context).colorScheme.surfaceContainerLowest,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey[300]!),
+                      border: Border.all(
+                          color: Theme.of(context).colorScheme.outlineVariant),
                     ),
                     child: IconButton(
-                      icon: const Icon(AppIcons.add, color: AppColors.primary),
+                      icon: Icon(AppIcons.add, color: AppColors.primary),
                       onPressed: (_isUpdating || _isDeleting)
                           ? null
                           : () async {
@@ -467,19 +495,28 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
               TextFormField(
                 controller: _descriptionController,
                 maxLines: 3,
-                style: const TextStyle(color: Colors.black87, fontSize: 16),
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 16),
                 decoration: InputDecoration(
                   hintText: 'Add a note or description...',
-                  hintStyle: TextStyle(color: Colors.grey[400]),
+                  hintStyle: TextStyle(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurfaceVariant
+                          .withValues(alpha: 0.7)),
                   filled: true,
-                  fillColor: Colors.grey[50],
+                  fillColor:
+                      Theme.of(context).colorScheme.surfaceContainerLowest,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
+                    borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.outlineVariant),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
+                    borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.outlineVariant),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -501,17 +538,20 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                 child: AbsorbPointer(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey[50],
+                      color:
+                          Theme.of(context).colorScheme.surfaceContainerLowest,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey[300]!),
+                      border: Border.all(
+                          color: Theme.of(context).colorScheme.outlineVariant),
                     ),
                     child: TextFormField(
                       controller: TextEditingController(
                         text:
                             DateFormat('EEEE, MMMM d, y').format(_selectedDate),
                       ),
-                      style:
-                          const TextStyle(color: Colors.black87, fontSize: 16),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 16),
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.transparent,
@@ -522,10 +562,10 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                           margin: const EdgeInsets.all(12),
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             AppIcons.calendar_today,
                             color: AppColors.primary,
                             size: 20,
@@ -550,7 +590,8 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor: Colors.grey[300],
+                    disabledBackgroundColor:
+                        Theme.of(context).colorScheme.outlineVariant,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -567,7 +608,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                             strokeWidth: 2.5,
                           ),
                         )
-                      : const Text(
+                      : Text(
                           'Update Transaction',
                           style: TextStyle(
                             fontSize: 18,
@@ -587,10 +628,10 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w600,
-        color: Colors.black87,
+        color: Theme.of(context).colorScheme.onSurface,
         letterSpacing: 0.5,
       ),
     );
@@ -616,7 +657,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: color.withOpacity(0.2),
+                    color: color.withValues(alpha: 0.2),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -626,14 +667,20 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: isSelected ? color : Colors.grey[600], size: 20),
+            Icon(icon,
+                color: isSelected
+                    ? color
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                size: 20),
             const SizedBox(width: 8),
             Text(
               label,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? color : Colors.grey[600],
+                color: isSelected
+                    ? color
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ],

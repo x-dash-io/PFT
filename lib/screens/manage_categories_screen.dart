@@ -151,19 +151,28 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
               TextField(
                 controller: _nameController,
                 autofocus: true,
-                style: const TextStyle(color: Colors.black87, fontSize: 16),
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 16),
                 decoration: InputDecoration(
                   hintText: 'Category Name',
-                  hintStyle: TextStyle(color: Colors.grey[400]),
+                  hintStyle: TextStyle(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurfaceVariant
+                          .withValues(alpha: 0.7)),
                   filled: true,
-                  fillColor: Colors.grey[50],
+                  fillColor:
+                      Theme.of(context).colorScheme.surfaceContainerLowest,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
+                    borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.outlineVariant),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
+                    borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.outlineVariant),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -194,16 +203,17 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.grey[50],
+                    color: Theme.of(context).colorScheme.surfaceContainerLowest,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey[300]!),
+                    border: Border.all(
+                        color: Theme.of(context).colorScheme.outlineVariant),
                   ),
                   child: Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
+                          color: AppColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
@@ -213,17 +223,19 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           'Select Icon',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: Colors.black87,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ),
-                      Icon(AppIcons.chevron_right, color: Colors.grey[600]),
+                      Icon(AppIcons.chevron_right,
+                          color:
+                              Theme.of(context).colorScheme.onSurfaceVariant),
                     ],
                   ),
                 ),
@@ -250,7 +262,7 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                   child: Text(
                     'Cancel',
                     style: TextStyle(
-                      color: Colors.grey[600],
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -325,7 +337,8 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor: Colors.grey[300],
+                    disabledBackgroundColor:
+                        Theme.of(context).colorScheme.outlineVariant,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 24, vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -343,7 +356,7 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                         )
                       : Text(
                           category == null ? 'Add' : 'Save',
-                          style: const TextStyle(fontWeight: FontWeight.w600),
+                          style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                 ),
               ],
@@ -369,12 +382,12 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Select an Icon',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 20),
@@ -396,9 +409,13 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                       borderRadius: BorderRadius.circular(12),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.grey[50],
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerLowest,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey[300]!),
+                          border: Border.all(
+                              color:
+                                  Theme.of(context).colorScheme.outlineVariant),
                         ),
                         child: Icon(
                           icon,
@@ -419,7 +436,7 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                     child: Text(
                       'Cancel',
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -451,7 +468,10 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
               Icon(
                 AppIcons.category_outlined,
                 size: 64,
-                color: Colors.grey[400],
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurfaceVariant
+                    .withValues(alpha: 0.7),
               ),
               const SizedBox(height: 16),
               Text(
@@ -459,7 +479,7 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(height: 8),
@@ -467,7 +487,10 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                 'Tap the + button to add one!',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey[500],
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurfaceVariant
+                      .withValues(alpha: 0.8),
                 ),
               ),
             ],
@@ -485,7 +508,11 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Colors.grey[200]!),
+            side: BorderSide(
+                color: Theme.of(context)
+                    .colorScheme
+                    .outlineVariant
+                    .withValues(alpha: 0.7)),
           ),
           child: ListTile(
             contentPadding: const EdgeInsets.symmetric(
@@ -496,7 +523,7 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -507,7 +534,7 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
             ),
             title: Text(
               category.name,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -518,7 +545,8 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon: const Icon(AppIcons.edit_outlined, color: Colors.grey),
+                  icon: Icon(AppIcons.edit_outlined,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
                   onPressed:
                       _isDeleting || _deletingCategoryIds.contains(category.id)
                           ? null
@@ -538,7 +566,7 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                             color: Colors.red,
                           ),
                         )
-                      : const Icon(AppIcons.delete_outline, color: Colors.red),
+                      : Icon(AppIcons.delete_outline, color: Colors.red),
                   onPressed: _isDeleting ||
                           _deletingCategoryIds.contains(category.id)
                       ? null
@@ -598,13 +626,14 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(AppIcons.arrow_back, color: Colors.black87),
+          icon: Icon(AppIcons.arrow_back,
+              color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Manage Categories',
           style: TextStyle(
-            color: Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
             fontWeight: FontWeight.bold,
             fontSize: 20,
           ),
@@ -613,7 +642,7 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.primary,
-          unselectedLabelColor: Colors.grey[600],
+          unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
           indicatorColor: AppColors.primary,
           indicatorWeight: 3,
           tabs: const [
@@ -638,8 +667,8 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
               },
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
-        label: const Text('Add Category'),
-        icon: const Icon(AppIcons.add),
+        label: Text('Add Category'),
+        icon: Icon(AppIcons.add),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),

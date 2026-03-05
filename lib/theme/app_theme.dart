@@ -287,7 +287,7 @@ class AppTheme {
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.white,
         elevation: 0,
-        indicatorColor: AppColors.primary.withOpacity(0.1),
+        indicatorColor: AppColors.primary.withValues(alpha: 0.1),
         labelTextStyle: WidgetStateProperty.all(
           GoogleFonts.manrope(
             fontSize: 12,
@@ -479,7 +479,7 @@ class AppTheme {
       // Input Decoration Theme - Dark Mode
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.darkNeutralBorder.withOpacity(0.3),
+        fillColor: AppColors.darkNeutralBorder.withValues(alpha: 0.3),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.darkNeutralBorder),
@@ -527,7 +527,7 @@ class AppTheme {
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.darkCardBackground,
         elevation: 0,
-        indicatorColor: AppColors.darkPrimary.withOpacity(0.1),
+        indicatorColor: AppColors.darkPrimary.withValues(alpha: 0.1),
         labelTextStyle: WidgetStateProperty.all(
           GoogleFonts.manrope(
             fontSize: 12,

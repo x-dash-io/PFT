@@ -202,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     return (
       icon: AppIcons.receipt_long_outlined,
-      color: AppColors.neutralMedium,
+      color: Theme.of(context).colorScheme.onSurfaceVariant,
     );
   }
 
@@ -221,7 +221,10 @@ class _HomeScreenState extends State<HomeScreen> {
     if (daysLeft <= 7) {
       return (text: 'Due in $daysLeft days', color: AppColors.warning);
     }
-    return (text: '$daysLeft days left', color: AppColors.neutralMedium);
+    return (
+      text: '$daysLeft days left',
+      color: Theme.of(context).colorScheme.onSurfaceVariant
+    );
   }
 
   DateTime _calculateNextDueDate(Bill bill) {
@@ -251,8 +254,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  AppColors.primary.withOpacity(0.06),
-                  AppColors.neutralBackground,
+                  AppColors.primary.withValues(alpha: 0.06),
+                  Theme.of(context).colorScheme.surfaceContainerLowest,
                 ],
               ),
             ),
@@ -329,7 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     _getGreeting(),
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: AppColors.neutralMedium,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontWeight: FontWeight.w600,
                         ),
                   ),
@@ -340,7 +343,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.w800,
-                          color: AppColors.neutralDark,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                   ),
                 ],
@@ -351,7 +354,7 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: const Icon(AppIcons.refresh),
               style: IconButton.styleFrom(
                 foregroundColor: AppColors.primary,
-                backgroundColor: AppColors.primary.withOpacity(0.12),
+                backgroundColor: AppColors.primary.withValues(alpha: 0.12),
               ),
               tooltip: 'Refresh',
             ),
@@ -370,7 +373,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.30),
+                color: AppColors.primary.withValues(alpha: 0.30),
                 blurRadius: 18,
                 offset: const Offset(0, 10),
               ),
@@ -382,7 +385,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Text(
                 'Total Balance',
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: Colors.white.withOpacity(0.90),
+                      color: Colors.white.withValues(alpha: 0.90),
                       fontWeight: FontWeight.w600,
                     ),
               ),
@@ -469,7 +472,7 @@ class _HomeScreenState extends State<HomeScreen> {
               'Recent Transactions',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w800,
-                    color: AppColors.neutralDark,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
             ),
             TextButton(
@@ -498,14 +501,20 @@ class _HomeScreenState extends State<HomeScreen> {
             Icon(
               AppIcons.info_outline,
               size: 14,
-              color: AppColors.neutralLight,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurfaceVariant
+                  .withValues(alpha: 0.8),
             ),
             const SizedBox(width: 6),
             Expanded(
               child: Text(
                 'Swipe right to edit, left to delete',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.neutralLight,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurfaceVariant
+                          .withValues(alpha: 0.8),
                       fontWeight: FontWeight.w600,
                     ),
               ),
@@ -527,7 +536,7 @@ class _HomeScreenState extends State<HomeScreen> {
               'Upcoming Bills',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w800,
-                    color: AppColors.neutralDark,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
             ),
             TextButton(
@@ -558,14 +567,15 @@ class _HomeScreenState extends State<HomeScreen> {
             margin: const EdgeInsets.only(top: 8),
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: AppColors.neutralBorder),
+              border: Border.all(
+                  color: Theme.of(context).colorScheme.outlineVariant),
             ),
             child: Text(
               'No upcoming bills. Tap "Add Bill" to create reminders.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.neutralMedium,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w600,
                   ),
             ),
@@ -592,15 +602,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Container(
                     padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(
-                        color: status.color.withOpacity(0.25),
+                        color: status.color.withValues(alpha: 0.25),
                         width: 1.2,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .shadow
+                              .withValues(alpha: 0.14),
                           blurRadius: 14,
                           offset: const Offset(0, 8),
                         ),
@@ -614,7 +627,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: styling.color.withOpacity(0.12),
+                                color: styling.color.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Icon(styling.icon,
@@ -625,14 +638,18 @@ class _HomeScreenState extends State<HomeScreen> {
                               Icon(
                                 LucideIcons.repeat,
                                 size: 16,
-                                color: AppColors.neutralMedium,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
                               ),
                             const SizedBox(width: 4),
                             PopupMenuButton<String>(
                               icon: Icon(
                                 LucideIcons.moreVertical,
                                 size: 18,
-                                color: AppColors.neutralMedium,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
                               ),
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
@@ -682,11 +699,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 14),
                         Text(
                           bill.name,
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColors.neutralDark,
-                                  ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -700,7 +719,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 .textTheme
                                 .headlineSmall
                                 ?.copyWith(
-                                  color: AppColors.neutralDark,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                   fontWeight: FontWeight.w800,
                                 ),
                           ),
@@ -710,7 +730,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: status.color.withOpacity(0.12),
+                            color: status.color.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: Text(
@@ -861,14 +881,15 @@ class _HomeScreenState extends State<HomeScreen> {
         margin: const EdgeInsets.only(top: 6),
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 22),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.neutralBorder),
+          border:
+              Border.all(color: Theme.of(context).colorScheme.outlineVariant),
         ),
         child: Text(
           'No transactions yet. Add one to see activity.',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.neutralMedium,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w600,
               ),
         ),
@@ -938,16 +959,17 @@ class _HomeScreenState extends State<HomeScreen> {
             margin: const EdgeInsets.only(bottom: 10),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.neutralBorder),
+              border: Border.all(
+                  color: Theme.of(context).colorScheme.outlineVariant),
             ),
             child: Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(9),
                   decoration: BoxDecoration(
-                    color: amountColor.withOpacity(0.12),
+                    color: amountColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
@@ -969,14 +991,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               fontWeight: FontWeight.w700,
-                              color: AppColors.neutralDark,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         transaction.date.split('T')[0],
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.neutralLight,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant
+                                  .withValues(alpha: 0.8),
                               fontWeight: FontWeight.w600,
                             ),
                       ),
@@ -1034,15 +1059,15 @@ class SummaryCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.neutralBorder),
-        color: Colors.white,
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+        color: Theme.of(context).colorScheme.surface,
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 22),
@@ -1055,7 +1080,7 @@ class SummaryCard extends StatelessWidget {
                 Text(
                   title,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.neutralMedium,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w700,
                       ),
                 ),
@@ -1098,7 +1123,7 @@ class _HeroStatChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.16),
+        color: Colors.white.withValues(alpha: 0.16),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -1114,7 +1139,7 @@ class _HeroStatChip extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: Colors.white.withOpacity(0.85),
+                        color: Colors.white.withValues(alpha: 0.85),
                         fontWeight: FontWeight.w700,
                       ),
                 ),

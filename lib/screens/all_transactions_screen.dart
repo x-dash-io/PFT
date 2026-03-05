@@ -120,7 +120,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                   // Filter by Type
                   DropdownButtonFormField<String>(
                     value: _filterType,
-                    hint: const Text('Filter by Type'),
+                    hint: Text('Filter by Type'),
                     decoration:
                         const InputDecoration(border: OutlineInputBorder()),
                     items: const [
@@ -136,7 +136,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                   // Filter by Category
                   DropdownButtonFormField<int>(
                     value: _filterCategoryId,
-                    hint: const Text('Filter by Category'),
+                    hint: Text('Filter by Category'),
                     decoration:
                         const InputDecoration(border: OutlineInputBorder()),
                     items: _allCategories
@@ -163,7 +163,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
-                    trailing: const Icon(AppIcons.calendar_today),
+                    trailing: Icon(AppIcons.calendar_today),
                     onTap: () async {
                       final picked =
                           await DatePickerHelper.showModernDateRangePicker(
@@ -199,7 +199,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                           _applyAllFilters();
                           Navigator.pop(context);
                         },
-                        child: const Text('Reset'),
+                        child: Text('Reset'),
                       ),
                       const SizedBox(width: 8),
                       ElevatedButton(
@@ -209,7 +209,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                           _applyAllFilters();
                           Navigator.pop(context);
                         },
-                        child: const Text('Apply'),
+                        child: Text('Apply'),
                       ),
                     ],
                   ),
@@ -230,10 +230,10 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All Transactions'),
+        title: Text('All Transactions'),
         actions: [
           IconButton(
-            icon: const Icon(AppIcons.filter_list),
+            icon: Icon(AppIcons.filter_list),
             onPressed: _showFilterSheet,
             tooltip: 'Filter Transactions',
           ),
@@ -247,10 +247,12 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                   padding: const EdgeInsets.all(16.0),
                   child: TextField(
                     controller: _searchController,
-                    style: const TextStyle(color: Colors.black87, fontSize: 16),
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 16),
                     decoration: InputDecoration(
                       hintText: 'Search by description or amount',
-                      prefixIcon: const Icon(AppIcons.search),
+                      prefixIcon: Icon(AppIcons.search),
                       filled: true,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -286,7 +288,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                                 leading: Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                    color: amountColor.withOpacity(0.1),
+                                    color: amountColor.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Icon(
@@ -300,8 +302,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                                   transaction.description.isEmpty
                                       ? transaction.type.capitalize()
                                       : transaction.description,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500),
+                                  style: TextStyle(fontWeight: FontWeight.w500),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
