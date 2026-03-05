@@ -1,36 +1,197 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper function to check if user is authenticated
     function isAuthenticated() {
       return request.auth != null;
     }
-    
-    // Helper function to check if user owns the document
+
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
-    
-    // Users collection - users can only read/write their own data
+
+    function isValidTransaction(userId) {
+      return request.resource.data.keys().hasOnly([
+            'id',
+            'type',
+            'amount',
+            'description',
+            'date',
+            'category_id',
+            'categoryId',
+            'userId'
+          ]) &&
+          request.resource.data.keys().hasAll([
+            'id',
+            'type',
+            'amount',
+            'description',
+            'date'
+          ]) &&
+          request.resource.data.id is int &&
+          request.resource.data.id > 0 &&
+          request.resource.data.type is string &&
+          (request.resource.data.type == 'income' ||
+              request.resource.data.type == 'expense') &&
+          request.resource.data.amount is number &&
+          request.resource.data.amount >= 0 &&
+          request.resource.data.description is string &&
+          request.resource.data.date is string &&
+          request.resource.data.date.size() > 0 &&
+          (!('category_id' in request.resource.data) ||
+              request.resource.data.category_id == null ||
+              request.resource.data.category_id is int) &&
+          (!('categoryId' in request.resource.data) ||
+              request.resource.data.categoryId == null ||
+              request.resource.data.categoryId is int) &&
+          (!('category_id' in request.resource.data) ||
+              !('categoryId' in request.resource.data) ||
+              request.resource.data.category_id == null ||
+              request.resource.data.categoryId == null ||
+              request.resource.data.category_id ==
+                  request.resource.data.categoryId) &&
+          (!('userId' in request.resource.data) ||
+              request.resource.data.userId == userId);
+    }
+
+    function isValidCategory(userId) {
+      return request.resource.data.keys().hasOnly([
+            'id',
+            'name',
+            'type',
+            'iconCodePoint',
+            'colorValue',
+            'icon_code_point',
+            'color_value',
+            'userId'
+          ]) &&
+          request.resource.data.keys().hasAll(['id', 'name', 'type']) &&
+          request.resource.data.id is int &&
+          request.resource.data.id > 0 &&
+          request.resource.data.name is string &&
+          request.resource.data.name.size() > 0 &&
+          request.resource.data.name.size() <= 80 &&
+          request.resource.data.type is string &&
+          (request.resource.data.type == 'income' ||
+              request.resource.data.type == 'expense') &&
+          (!('iconCodePoint' in request.resource.data) ||
+              request.resource.data.iconCodePoint == null ||
+              request.resource.data.iconCodePoint is int) &&
+          (!('colorValue' in request.resource.data) ||
+              request.resource.data.colorValue == null ||
+              request.resource.data.colorValue is int) &&
+          (!('icon_code_point' in request.resource.data) ||
+              request.resource.data.icon_code_point == null ||
+              request.resource.data.icon_code_point is int) &&
+          (!('color_value' in request.resource.data) ||
+              request.resource.data.color_value == null ||
+              request.resource.data.color_value is int) &&
+          (!('userId' in request.resource.data) ||
+              request.resource.data.userId == userId);
+    }
+
+    function isValidBill(userId) {
+      return request.resource.data.keys().hasOnly([
+            'id',
+            'name',
+            'amount',
+            'dueDate',
+            'due_date',
+            'isRecurring',
+            'is_recurring',
+            'recurrenceType',
+            'recurrence_type',
+            'recurrenceValue',
+            'recurrence_value',
+            'userId'
+          ]) &&
+          request.resource.data.keys().hasAll(['id', 'name', 'amount']) &&
+          request.resource.data.id is int &&
+          request.resource.data.id > 0 &&
+          request.resource.data.name is string &&
+          request.resource.data.name.size() > 0 &&
+          request.resource.data.name.size() <= 120 &&
+          request.resource.data.amount is number &&
+          request.resource.data.amount >= 0 &&
+          ((('dueDate' in request.resource.data) &&
+                  request.resource.data.dueDate is string &&
+                  request.resource.data.dueDate.size() > 0) ||
+              (('due_date' in request.resource.data) &&
+                  request.resource.data.due_date is string &&
+                  request.resource.data.due_date.size() > 0)) &&
+          (!('isRecurring' in request.resource.data) ||
+              (request.resource.data.isRecurring is int &&
+                  (request.resource.data.isRecurring == 0 ||
+                      request.resource.data.isRecurring == 1))) &&
+          (!('is_recurring' in request.resource.data) ||
+              (request.resource.data.is_recurring is int &&
+                  (request.resource.data.is_recurring == 0 ||
+                      request.resource.data.is_recurring == 1))) &&
+          (!('recurrenceType' in request.resource.data) ||
+              request.resource.data.recurrenceType == null ||
+              (request.resource.data.recurrenceType is string &&
+                  (request.resource.data.recurrenceType == 'weekly' ||
+                      request.resource.data.recurrenceType == 'monthly'))) &&
+          (!('recurrence_type' in request.resource.data) ||
+              request.resource.data.recurrence_type == null ||
+              (request.resource.data.recurrence_type is string &&
+                  (request.resource.data.recurrence_type == 'weekly' ||
+                      request.resource.data.recurrence_type == 'monthly'))) &&
+          (!('recurrenceValue' in request.resource.data) ||
+              request.resource.data.recurrenceValue == null ||
+              (request.resource.data.recurrenceValue is int &&
+                  request.resource.data.recurrenceValue > 0 &&
+                  request.resource.data.recurrenceValue <= 31)) &&
+          (!('recurrence_value' in request.resource.data) ||
+              request.resource.data.recurrence_value == null ||
+              (request.resource.data.recurrence_value is int &&
+                  request.resource.data.recurrence_value > 0 &&
+                  request.resource.data.recurrence_value <= 31)) &&
+          (!('userId' in request.resource.data) ||
+              request.resource.data.userId == userId);
+    }
+
     match /users/{userId} {
-      // Allow users to read/write their own user document
-      allow read, write: if isOwner(userId);
-      
-      // Transactions subcollection
+      allow read, create, update, delete: if isOwner(userId);
+
       match /transactions/{transactionId} {
-        allow read, write: if isOwner(userId);
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidTransaction(userId);
+        allow update: if isOwner(userId) &&
+            isValidTransaction(userId) &&
+            request.resource.data.id == resource.data.id &&
+            (!('userId' in resource.data) ||
+                !('userId' in request.resource.data) ||
+                request.resource.data.userId == resource.data.userId);
+        allow delete: if isOwner(userId);
       }
-      
-      // Categories subcollection
+
       match /categories/{categoryId} {
-        allow read, write: if isOwner(userId);
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidCategory(userId);
+        allow update: if isOwner(userId) &&
+            isValidCategory(userId) &&
+            request.resource.data.id == resource.data.id &&
+            (!('userId' in resource.data) ||
+                !('userId' in request.resource.data) ||
+                request.resource.data.userId == resource.data.userId);
+        allow delete: if isOwner(userId);
       }
-      
-      // Bills subcollection
+
       match /bills/{billId} {
-        allow read, write: if isOwner(userId);
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidBill(userId);
+        allow update: if isOwner(userId) &&
+            isValidBill(userId) &&
+            request.resource.data.id == resource.data.id &&
+            (!('userId' in resource.data) ||
+                !('userId' in request.resource.data) ||
+                request.resource.data.userId == resource.data.userId);
+        allow delete: if isOwner(userId);
       }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
-

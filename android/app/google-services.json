@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "142893563437-ufb8bu449cah0oa9anjra4qlo4mp2kir.apps.googleusercontent.com",
+          "client_id": "142893563437-d0538losa9aut9i63aki3t6do4justsk.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.ledgerlite",
-            "certificate_hash": "e2b9e63be20ed8a24b1b87c6789e0d2b89c12617"
+            "certificate_hash": "e4f4c5f78ba3dfc9a8dd072aa4d272f76593a53c"
           }
         },
         {
