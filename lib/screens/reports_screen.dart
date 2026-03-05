@@ -627,7 +627,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
     final hasData =
         series.any((point) => point.income > 0 || point.expense > 0);
-    final xStep = math.max(1, (series.length / 6).ceil());
+    final xStep = math.max(1, (series.length / 5).ceil());
 
     if (!hasData) {
       return _SectionCard(
@@ -654,10 +654,15 @@ class _ReportsScreenState extends State<ReportsScreen> {
         .map((point) => math.max(point.income, point.expense))
         .fold<double>(0, (current, value) => value > current ? value : current);
     final effectiveMaxMagnitude =
-        maxMagnitude <= 0 ? 100.0 : (maxMagnitude * 1.25) + 100;
-    final yInterval = math.max(effectiveMaxMagnitude / 3, 100.0);
-    final minY = -effectiveMaxMagnitude;
+        maxMagnitude <= 0 ? 100.0 : (maxMagnitude * 1.18) + 80;
+    final yInterval = math.max(effectiveMaxMagnitude / 4, 50.0);
     final maxY = effectiveMaxMagnitude;
+    final peakIncome = series
+        .map((point) => point.income)
+        .fold<double>(0, (current, value) => value > current ? value : current);
+    final peakExpense = series
+        .map((point) => point.expense)
+        .fold<double>(0, (current, value) => value > current ? value : current);
 
     final incomeSpots = [
       for (int index = 0; index < series.length; index++)
@@ -665,7 +670,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
     ];
     final expenseSpots = [
       for (int index = 0; index < series.length; index++)
-        FlSpot(index.toDouble(), -series[index].expense),
+        FlSpot(index.toDouble(), series[index].expense),
     ];
 
     return _SectionCard(
@@ -674,10 +679,30 @@ class _ReportsScreenState extends State<ReportsScreen> {
       subtitle: 'Income and expenses for ${_periodPhrase(_selectedTimeFilter)}',
       trailing: _PeriodPill(label: _periodLabel(_selectedTimeFilter)),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              _LegendChip(
+                label:
+                    'Peak Income ${_formatAmount(peakIncome, compact: true)}',
+                color: AppColors.success,
+                icon: AppIcons.arrow_downward,
+              ),
+              _LegendChip(
+                label:
+                    'Peak Expense ${_formatAmount(peakExpense, compact: true)}',
+                color: AppColors.error,
+                icon: AppIcons.arrow_upward,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
           Container(
-            height: 286,
-            padding: const EdgeInsets.fromLTRB(10, 16, 10, 6),
+            height: 328,
+            padding: const EdgeInsets.fromLTRB(10, 18, 10, 8),
             decoration: BoxDecoration(
               color: surfaceColor,
               borderRadius: BorderRadius.circular(14),
@@ -685,7 +710,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
             ),
             child: LineChart(
               LineChartData(
-                minY: minY,
+                minY: 0,
                 maxY: maxY,
                 baselineY: 0,
                 lineTouchData: LineTouchData(
@@ -699,10 +724,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       return spots.map((spot) {
                         final isIncomeLine = spot.barIndex == 0;
                         final label = isIncomeLine ? 'Income' : 'Expense';
-                        final amount = spot.y.abs();
-                        final prefix = isIncomeLine ? '' : '-';
+                        final amount = spot.y;
                         return LineTooltipItem(
-                          '$label\n$prefix${_formatAmount(amount, compact: true)}',
+                          '$label\n${_formatAmount(amount, compact: true)}',
                           const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
@@ -718,12 +742,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   drawVerticalLine: false,
                   horizontalInterval: yInterval,
                   getDrawingHorizontalLine: (value) {
-                    if (value == 0) {
-                      return FlLine(
-                        color: AppColors.primary.withValues(alpha: 0.45),
-                        strokeWidth: 1.8,
-                      );
-                    }
                     return FlLine(
                       color: borderColor,
                       strokeWidth: 1,
@@ -740,7 +758,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 34,
+                      reservedSize: 30,
                       interval: xStep.toDouble(),
                       getTitlesWidget: (value, _) {
                         final index = value.toInt();
@@ -774,10 +792,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       reservedSize: 58,
                       interval: yInterval,
                       getTitlesWidget: (value, _) {
-                        final absValue = value.abs();
-                        final display = value < 0
-                            ? '-${_compactFormatter.format(absValue)}'
-                            : _compactFormatter.format(absValue);
+                        if (value < 0) {
+                          return const SizedBox.shrink();
+                        }
+                        final display = _compactFormatter.format(value);
                         return Text(
                           display,
                           style:
@@ -804,33 +822,56 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     spots: incomeSpots,
                     isCurved: true,
                     color: AppColors.success,
-                    barWidth: 3.2,
+                    barWidth: 3.4,
                     isStrokeCapRound: true,
                     dotData: const FlDotData(show: false),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          AppColors.success.withValues(alpha: 0.22),
+                          AppColors.success.withValues(alpha: 0.02),
+                        ],
+                      ),
+                    ),
                   ),
                   LineChartBarData(
                     spots: expenseSpots,
                     isCurved: true,
                     color: AppColors.error,
-                    barWidth: 3.2,
+                    barWidth: 3.4,
                     isStrokeCapRound: true,
                     dotData: const FlDotData(show: false),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          AppColors.error.withValues(alpha: 0.2),
+                          AppColors.error.withValues(alpha: 0.02),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 14),
-          const Row(
+          const Wrap(
+            spacing: 10,
+            runSpacing: 10,
             children: [
               _LegendChip(
                 label: 'Income',
                 color: AppColors.success,
                 icon: AppIcons.arrow_downward,
               ),
-              SizedBox(width: 10),
               _LegendChip(
-                label: 'Expenses (-)',
+                label: 'Expenses',
                 color: AppColors.error,
                 icon: AppIcons.arrow_upward,
               ),
@@ -909,7 +950,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         children: [
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
@@ -929,36 +970,49 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: muted,
                           fontWeight: FontWeight.w700,
+                          height: 1.3,
                         ),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           LayoutBuilder(
             builder: (context, constraints) {
-              final useRowLayout = constraints.maxWidth > 580;
+              final useRowLayout = constraints.maxWidth >= 680;
 
-              final chart = SizedBox(
-                height: 220,
-                width: useRowLayout ? 240 : double.infinity,
+              final chartRadius = useRowLayout ? 86.0 : 92.0;
+              final chart = Container(
+                height: useRowLayout ? 270 : 286,
+                width: useRowLayout ? 286 : double.infinity,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .outlineVariant
+                        .withValues(alpha: 0.72),
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 child: PieChart(
                   PieChartData(
-                    centerSpaceRadius: 48,
-                    sectionsSpace: 2,
+                    centerSpaceRadius: 50,
+                    sectionsSpace: 3,
+                    centerSpaceColor: Theme.of(context).colorScheme.surface,
                     sections: [
                       for (final entry in pieEntries)
                         PieChartSectionData(
                           color: colorMap[entry.key],
                           value: entry.value,
-                          radius: 86,
+                          radius: chartRadius,
                           title:
                               '${((entry.value / totalExpenses) * 100).round()}%',
                           titleStyle: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
-                            fontSize: 12,
+                            fontSize: 11,
                           ),
                         ),
                     ],
@@ -984,7 +1038,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 return Column(
                   children: [
                     chart,
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
                     legend,
                   ],
                 );
@@ -994,7 +1048,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   chart,
-                  const SizedBox(width: 20),
+                  const SizedBox(width: 24),
                   Expanded(child: legend),
                 ],
               );
@@ -1478,8 +1532,8 @@ class _CategoryBreakdownRow extends StatelessWidget {
         isDark ? AppColors.darkNeutralMedium : AppColors.neutralMedium;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: borderColor),
@@ -1487,37 +1541,37 @@ class _CategoryBreakdownRow extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 10,
-            height: 10,
+            width: 12,
+            height: 12,
             decoration: BoxDecoration(
               color: color,
               shape: BoxShape.circle,
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
           Text(
             amount,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
           Text(
             percent,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   color: muted,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
                 ),
           ),
         ],

@@ -47,52 +47,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _preloadImage(String imageUrl) async {
-    if (_cachedImageUrl == imageUrl) return; // Already cached
+    if (!mounted || _cachedImageUrl == imageUrl) return;
 
     setState(() {
       _isImageLoading = true;
     });
 
     try {
-      // Preload the image
-      final imageProvider = NetworkImage(imageUrl);
-      await imageProvider.resolve(const ImageConfiguration());
-
-      if (mounted) {
-        setState(() {
-          _cachedImageUrl = imageUrl;
-          _isImageLoading = false;
-        });
-      }
+      await precacheImage(NetworkImage(imageUrl), context);
+      if (!mounted) return;
+      setState(() {
+        _cachedImageUrl = imageUrl;
+        _isImageLoading = false;
+      });
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isImageLoading = false;
-        });
-      }
+      if (!mounted) return;
+      setState(() {
+        _isImageLoading = false;
+      });
     }
   }
 
   Future<void> _preloadProfileImage() async {
     if (currentUser?.photoURL != null && currentUser!.photoURL!.isNotEmpty) {
-      String imageUrl = currentUser!.photoURL!;
-      // Optimize image URL
-      if (imageUrl.contains('cloudinary.com')) {
-        if (!imageUrl.contains('/upload/')) {
-          imageUrl = imageUrl.replaceAll(
-            '/upload/',
-            '/upload/w_200,h_200,c_fill,q_auto,f_auto/',
-          );
-        } else if (!imageUrl.contains('w_')) {
-          final parts = imageUrl.split('/upload/');
-          if (parts.length == 2) {
-            imageUrl =
-                '${parts[0]}/upload/w_200,h_200,c_fill,q_auto,f_auto/${parts[1]}';
-          }
-        }
-      }
+      final imageUrl = _optimizedProfileImageUrl(currentUser!.photoURL!);
       await _preloadImage(imageUrl);
     }
+  }
+
+  String _optimizedProfileImageUrl(String imageUrl) {
+    if (!imageUrl.contains('cloudinary.com') ||
+        !imageUrl.contains('/upload/')) {
+      return imageUrl;
+    }
+
+    if (imageUrl.contains('/upload/w_')) {
+      return imageUrl;
+    }
+
+    return imageUrl.replaceFirst(
+      '/upload/',
+      '/upload/w_200,h_200,c_fill,q_auto,f_auto/',
+    );
   }
 
   Future<void> _refreshUserData() async {
@@ -168,25 +164,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
           // Reload one more time to ensure we have the latest data
           await updatedUser.reload();
           final finalUser = _auth.currentUser;
+          if (!mounted) return;
 
-          if (mounted) {
-            // Preload the image again to ensure it's cached
-            if (finalUser?.photoURL != null) {
-              await _preloadImage(finalUser!.photoURL!);
-            }
-            // The StreamBuilder will automatically update the UI
-            if (finalUser?.photoURL == imageUrl ||
-                finalUser?.photoURL != null) {
-              SnackbarHelper.showSuccess(
-                context,
-                'Profile picture updated successfully!',
-              );
-            } else {
-              SnackbarHelper.showSuccess(
-                context,
-                'Profile picture updated! Changes will appear after app restart.',
-              );
-            }
+          // Preload the image again to ensure it's cached.
+          if (finalUser?.photoURL != null) {
+            await _preloadImage(finalUser!.photoURL!);
+            if (!mounted) return;
+          }
+
+          if (finalUser?.photoURL == imageUrl || finalUser?.photoURL != null) {
+            SnackbarHelper.showSuccess(
+              context,
+              'Profile picture updated successfully!',
+            );
+          } else {
+            SnackbarHelper.showSuccess(
+              context,
+              'Profile picture updated! Changes will appear after app restart.',
+            );
           }
         }
       } else {
@@ -333,7 +328,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
 
     try {
-      if (await canLaunchUrl(whatsappUrl)) {
+      final canLaunch = await canLaunchUrl(whatsappUrl);
+      if (!mounted) return;
+
+      if (canLaunch) {
         await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
       } else {
         SnackbarHelper.showError(
@@ -342,6 +340,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       }
     } catch (e) {
+      if (!mounted) return;
       SnackbarHelper.showError(context, 'An error occurred.');
     }
   }
@@ -398,7 +397,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
           ),
-          child: Text(
+          child: const Text(
             'Close',
             style: TextStyle(fontWeight: FontWeight.w600),
           ),
@@ -447,11 +446,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() => _isRestoring = true);
       try {
         await dbHelper.restoreFromFirestore(currentUser!.uid);
+        if (!mounted) return;
         SnackbarHelper.showSuccess(
           context,
           "Data restored successfully! Please restart the app to see all changes.",
         );
       } catch (e) {
+        if (!mounted) return;
         SnackbarHelper.showError(context, "Error restoring data: $e");
       } finally {
         if (mounted) setState(() => _isRestoring = false);
@@ -466,7 +467,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder: (context, userSnapshot) {
         final user = userSnapshot.data ?? currentUser;
 
-        // If user is null (logged out), show loading as AuthGate will handle navigation
         if (user == null) {
           return Scaffold(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -474,7 +474,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         }
 
-        // Preload image when user data changes
         if (user.photoURL != null && user.photoURL!.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted && currentUser != null) {
@@ -483,267 +482,126 @@ class _ProfileScreenState extends State<ProfileScreen> {
           });
         }
 
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final topGradientColor =
+            (isDark ? AppColors.darkPrimary : AppColors.primary).withValues(
+          alpha: isDark ? 0.18 : 0.08,
+        );
+
         return Scaffold(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          body: SafeArea(
-            child: Column(
-              children: [
-                // Profile Header
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(24.0),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        AppColors.primary.withValues(alpha: 0.1),
-                        AppColors.primary.withValues(alpha: 0.05),
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  topGradientColor,
+                  Theme.of(context).scaffoldBackgroundColor,
+                ],
+              ),
+            ),
+            child: SafeArea(
+              child: RefreshIndicator(
+                onRefresh: _refreshUserData,
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
+                  ),
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+                  children: [
+                    _buildScreenHeader(),
+                    const SizedBox(height: 16),
+                    _buildProfileHero(user),
+                    const SizedBox(height: 20),
+                    _buildSectionCard(
+                      icon: AppIcons.money,
+                      title: 'Preferences',
+                      subtitle: 'Customize your finance workspace.',
+                      children: [
+                        _buildActionTile(
+                          icon: AppIcons.money,
+                          title: 'Currency',
+                          subtitle: 'Choose your default amount format',
+                          trailing: _buildCurrencyTrailingPill(),
+                          onTap: _showCurrencyPicker,
+                        ),
                       ],
                     ),
-                  ),
-                  child: Column(
-                    children: [
-                      GestureDetector(
-                        onTap: _pickAndUploadImage,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            _buildProfileAvatar(user),
-                            if (_isUploading)
-                              Container(
-                                width: 100,
-                                height: 100,
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.5),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const CircularProgressIndicator(
-                                  strokeWidth: 3,
-                                  color: Colors.white,
-                                ),
-                              ),
-                          ],
+                    const SizedBox(height: 14),
+                    _buildSectionCard(
+                      icon: AppIcons.security,
+                      title: 'Account & Security',
+                      subtitle: 'Manage account access and sensitive actions.',
+                      children: [
+                        _buildActionTile(
+                          icon: AppIcons.password,
+                          title: 'Change Password',
+                          subtitle: 'Send a reset link to your email',
+                          onTap: _sendPasswordResetEmail,
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              user.displayName ?? 'User',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: _showUpdateNameDialog,
-                            child: Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Icon(
-                                AppIcons.edit,
-                                size: 18,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        user.email ?? 'No email',
-                        style: TextStyle(
-                            fontSize: 14,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Settings List
-                Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.all(16.0),
-                    children: [
-                      // App Settings Section
-                      _buildSectionHeader('App Settings'),
-                      const SizedBox(height: 12),
-                      _buildModernCard(
-                        children: [
-                          _buildSettingTile(
-                            icon: AppIcons.money,
-                            title: 'Currency',
-                            trailing: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: DropdownButton<String>(
-                                value: _selectedCurrency,
-                                underline: const SizedBox(),
-                                items: <String>['KSh', 'USD', 'EUR', 'GBP']
-                                    .map<DropdownMenuItem<String>>(
-                                      (String value) =>
-                                          DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Text(
-                                          value,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            color: AppColors.primary,
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                    .toList(),
-                                onChanged: (String? newValue) {
-                                  if (newValue != null) {
-                                    _saveCurrencyPreference(newValue);
-                                    SnackbarHelper.showSuccess(
-                                      context,
-                                      'Currency updated!',
-                                    );
-                                  }
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Account Section
-                      _buildSectionHeader('Account'),
-                      const SizedBox(height: 12),
-                      _buildModernCard(
-                        children: [
-                          _buildSettingTile(
-                            icon: AppIcons.password,
-                            title: 'Change Password',
-                            onTap: _sendPasswordResetEmail,
-                          ),
-                          Divider(height: 1),
-                          _buildSettingTile(
-                            icon: AppIcons.delete_forever,
-                            title: 'Delete Account',
-                            titleColor: Colors.red,
-                            iconColor: Colors.red,
-                            onTap: _deleteAccount,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Data & Sync Section
-                      _buildSectionHeader('Data & Sync'),
-                      const SizedBox(height: 12),
-                      _buildModernCard(
-                        children: [
-                          _buildSettingTile(
-                            icon: AppIcons.cloud_download_outlined,
-                            title: 'Restore from Cloud',
-                            subtitle: 'Download your backup on a new device',
-                            trailing: _isRestoring
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                      color: AppColors.primary,
-                                    ),
-                                  )
-                                : Icon(
-                                    AppIcons.chevron_right,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                                  ),
-                            onTap: _isRestoring ? null : _handleRestore,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Help & Support Section
-                      _buildSectionHeader('Help & Support'),
-                      const SizedBox(height: 12),
-                      _buildModernCard(
-                        children: [
-                          _buildSettingTile(
-                            icon: AppIcons.question_answer_outlined,
-                            title: 'FAQ',
-                            onTap: _showFaqDialog,
-                          ),
-                          Divider(height: 1),
-                          _buildSettingTile(
-                            customLeading: SvgPicture.asset(
-                              'assets/icons/whatsapp_logo.svg',
-                              width: 24,
-                              height: 24,
-                            ),
-                            iconColor: const Color(0xFF25D366),
-                            title: 'Contact via WhatsApp',
-                            onTap: _launchWhatsApp,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 32),
-
-                      // Logout Button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton.icon(
-                          onPressed: _isLoggingOut ? null : _logout,
-                          icon: _isLoggingOut
+                        _buildActionTile(
+                          icon: AppIcons.delete_forever,
+                          title: 'Delete Account',
+                          subtitle: 'Permanently remove your account and data',
+                          accentColor: AppColors.error,
+                          titleColor: AppColors.error,
+                          onTap: _deleteAccount,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    _buildSectionCard(
+                      icon: AppIcons.cloud_download_outlined,
+                      title: 'Data & Sync',
+                      subtitle: 'Restore your cloud backup on this device.',
+                      children: [
+                        _buildActionTile(
+                          icon: AppIcons.cloud_download_outlined,
+                          title: 'Restore from Cloud',
+                          subtitle: 'Replace local records with cloud backup',
+                          trailing: _isRestoring
                               ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
+                                  width: 18,
+                                  height: 18,
                                   child: CircularProgressIndicator(
-                                    strokeWidth: 2.5,
-                                    color: Colors.white,
+                                    strokeWidth: 2.2,
                                   ),
                                 )
-                              : Icon(AppIcons.logout),
-                          label: Text(
-                            _isLoggingOut ? 'Logging out...' : 'Logout',
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                            disabledBackgroundColor:
-                                Theme.of(context).colorScheme.outlineVariant,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            elevation: 0,
-                          ),
+                              : null,
+                          onTap: _isRestoring ? null : _handleRestore,
                         ),
-                      ),
-                      const SizedBox(height: 24),
-                    ],
-                  ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    _buildSectionCard(
+                      icon: AppIcons.support_agent,
+                      title: 'Help & Support',
+                      subtitle: 'Get answers or contact support directly.',
+                      children: [
+                        _buildActionTile(
+                          icon: AppIcons.question_answer_outlined,
+                          title: 'FAQ',
+                          subtitle: 'Read common questions and quick tips',
+                          onTap: _showFaqDialog,
+                        ),
+                        _buildActionTile(
+                          customLeading: SvgPicture.asset(
+                            'assets/icons/whatsapp_logo.svg',
+                            width: 18,
+                            height: 18,
+                          ),
+                          accentColor: const Color(0xFF25D366),
+                          title: 'Contact via WhatsApp',
+                          subtitle: 'Chat with support in WhatsApp',
+                          onTap: _launchWhatsApp,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    _buildLogoutButton(),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         );
@@ -751,186 +609,632 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4.0),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-          color: Theme.of(context).colorScheme.onSurface,
-          letterSpacing: 0.5,
-        ),
-      ),
-    );
-  }
+  Widget _buildScreenHeader() {
+    final textTheme = Theme.of(context).textTheme;
+    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
 
-  Widget _buildModernCard({required List<Widget> children}) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-            color: Theme.of(context)
-                .colorScheme
-                .outlineVariant
-                .withValues(alpha: 0.7)),
-      ),
-      child: Column(children: children),
-    );
-  }
-
-  Widget _buildProfileAvatar(User user) {
-    if (user.photoURL == null || user.photoURL!.isEmpty) {
-      return CircleAvatar(
-        radius: 50,
-        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-        child: Icon(AppIcons.person, size: 50, color: AppColors.primary),
-      );
-    }
-
-    // Optimize image URL with Cloudinary transformations for faster loading
-    String imageUrl = user.photoURL!;
-    // Add Cloudinary transformations if it's a Cloudinary URL
-    if (imageUrl.contains('cloudinary.com')) {
-      // Transform to smaller, optimized format: w_200,h_200,c_fill,q_auto,f_auto
-      // This loads faster and uses less bandwidth
-      if (!imageUrl.contains('/upload/')) {
-        // If URL doesn't have transformations, add them
-        imageUrl = imageUrl.replaceAll(
-          '/upload/',
-          '/upload/w_200,h_200,c_fill,q_auto,f_auto/',
-        );
-      } else if (!imageUrl.contains('w_')) {
-        // Insert transformations before filename
-        final parts = imageUrl.split('/upload/');
-        if (parts.length == 2) {
-          imageUrl =
-              '${parts[0]}/upload/w_200,h_200,c_fill,q_auto,f_auto/${parts[1]}';
-        }
-      }
-    }
-
-    final isLoading = _isImageLoading && _cachedImageUrl != imageUrl;
-
-    return Stack(
-      alignment: Alignment.center,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Circular progress indicator as border
-        if (isLoading)
-          SizedBox(
-            width: 104,
-            height: 104,
-            child: CircularProgressIndicator(
-              strokeWidth: 4,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                AppColors.primary,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Profile',
+                style: textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
               ),
-              backgroundColor: Theme.of(context)
-                  .colorScheme
-                  .outlineVariant
-                  .withValues(alpha: 0.7),
-            ),
+              const SizedBox(height: 4),
+              Text(
+                'Manage preferences, security, and support settings.',
+                style: textTheme.bodyMedium?.copyWith(
+                  color: muted,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ),
-        // Avatar with image
-        CircleAvatar(
-          radius: 50,
-          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-          child: ClipOval(
-            child: Image.network(
-              imageUrl,
-              width: 100,
-              height: 100,
-              fit: BoxFit.cover,
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null && !isLoading) {
-                  return child;
-                }
-                // Show placeholder while loading
-                return Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    AppIcons.person,
-                    size: 50,
-                    color: AppColors.primary,
-                  ),
-                );
-              },
-              errorBuilder: (context, error, stackTrace) {
-                return CircleAvatar(
-                  radius: 50,
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                  child: Icon(
-                    AppIcons.person,
-                    size: 50,
-                    color: AppColors.primary,
-                  ),
-                );
-              },
-              cacheWidth: 200, // Cache optimized size
-              cacheHeight: 200,
-            ),
+        ),
+        const SizedBox(width: 12),
+        IconButton.filledTonal(
+          onPressed: _refreshUserData,
+          icon: const Icon(AppIcons.refresh),
+          style: IconButton.styleFrom(
+            foregroundColor: AppColors.primary,
+            backgroundColor: AppColors.primary.withValues(alpha: 0.14),
           ),
+          tooltip: 'Refresh profile',
         ),
       ],
     );
   }
 
-  Widget _buildSettingTile({
+  Widget _buildProfileHero(User user) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final heroPrimary = isDark ? AppColors.darkPrimary : AppColors.primary;
+    final heroSecondary = isDark ? AppColors.darkTertiary : AppColors.tertiary;
+    final displayName = (user.displayName ?? '').trim().isEmpty
+        ? 'User'
+        : user.displayName!.trim();
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [heroPrimary, heroSecondary],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: heroPrimary.withValues(alpha: 0.32),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              GestureDetector(
+                onTap: _pickAndUploadImage,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    _buildProfileAvatar(user),
+                    Positioned(
+                      right: -2,
+                      bottom: -2,
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Icon(
+                          AppIcons.edit,
+                          size: 14,
+                          color: heroPrimary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            displayName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: _showUpdateNameDialog,
+                          icon: const Icon(AppIcons.edit, size: 16),
+                          style: IconButton.styleFrom(
+                            minimumSize: const Size(32, 32),
+                            padding: EdgeInsets.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            foregroundColor: Colors.white,
+                            backgroundColor:
+                                Colors.white.withValues(alpha: 0.16),
+                          ),
+                          tooltip: 'Edit name',
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      user.email ?? 'No email',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _buildHeroPill(
+                          icon: AppIcons.money,
+                          text: 'Currency: $_selectedCurrency',
+                        ),
+                        _buildHeroPill(
+                          icon: AppIcons.verified_user_outlined,
+                          text: user.emailVerified
+                              ? 'Email verified'
+                              : 'Verify email',
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: _buildQuickActionButton(
+                  icon: AppIcons.edit,
+                  label: 'Edit Name',
+                  onTap: _showUpdateNameDialog,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildQuickActionButton(
+                  icon: AppIcons.password,
+                  label: 'Reset Password',
+                  onTap: _sendPasswordResetEmail,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeroPill({required IconData icon, required String text}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: Colors.white),
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 11),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.16),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.26)),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 15, color: Colors.white),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required List<Widget> children,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final borderColor =
+        isDark ? AppColors.darkNeutralBorder : AppColors.neutralBorder;
+    final surfaceColor =
+        isDark ? AppColors.darkCardBackground : AppColors.white;
+    final muted =
+        isDark ? AppColors.darkNeutralMedium : AppColors.neutralMedium;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(9),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, size: 17, color: AppColors.primary),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: muted,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          for (int index = 0; index < children.length; index++) ...[
+            children[index],
+            if (index < children.length - 1)
+              Divider(
+                height: 1,
+                color: Theme.of(context).colorScheme.outlineVariant.withValues(
+                      alpha: 0.72,
+                    ),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionTile({
     IconData? icon,
     Widget? customLeading,
     required String title,
     String? subtitle,
     Widget? trailing,
     VoidCallback? onTap,
+    Color? accentColor,
     Color? titleColor,
-    Color? iconColor,
   }) {
-    final Widget leadingIcon = customLeading ??
+    final color = accentColor ?? AppColors.primary;
+    final leadingIcon = customLeading ??
         Icon(
-          icon ?? AppIcons.question_answer_outlined,
-          color: iconColor ?? AppColors.primary,
-          size: 24,
+          icon ?? AppIcons.info_outline,
+          size: 18,
+          color: color,
         );
+    final isEnabled = onTap != null;
+    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
 
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      leading: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: (iconColor ?? AppColors.primary).withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(10),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: leadingIcon,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: titleColor ??
+                                Theme.of(context).colorScheme.onSurface,
+                          ),
+                    ),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: muted,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              trailing ??
+                  (isEnabled
+                      ? Icon(AppIcons.chevron_right, size: 18, color: muted)
+                      : Icon(
+                          AppIcons.chevron_right,
+                          size: 18,
+                          color: muted.withValues(alpha: 0.45),
+                        )),
+            ],
+          ),
         ),
-        child: leadingIcon,
       ),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-          color: titleColor ?? Theme.of(context).colorScheme.onSurface,
+    );
+  }
+
+  Widget _buildCurrencyTrailingPill() {
+    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Text(
+            _selectedCurrency,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Icon(AppIcons.chevron_right, size: 18, color: muted),
+      ],
+    );
+  }
+
+  Future<void> _showCurrencyPicker() async {
+    const currencies = <String>['KSh', 'USD', 'EUR', 'GBP'];
+
+    final selectedCurrency = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (bottomSheetContext) {
+        final muted = Theme.of(bottomSheetContext).colorScheme.onSurfaceVariant;
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 38,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: muted.withValues(alpha: 0.45),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                'Select currency',
+                style: Theme.of(bottomSheetContext)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'This affects all amount labels across the app.',
+                style:
+                    Theme.of(bottomSheetContext).textTheme.bodySmall?.copyWith(
+                          color: muted,
+                          fontWeight: FontWeight.w600,
+                        ),
+              ),
+              const SizedBox(height: 12),
+              for (final currency in currencies)
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => Navigator.of(bottomSheetContext).pop(currency),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 10,
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              currency,
+                              style: Theme.of(bottomSheetContext)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                          if (_selectedCurrency == currency)
+                            const Icon(
+                              AppIcons.check_circle,
+                              size: 18,
+                              color: AppColors.success,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (!mounted ||
+        selectedCurrency == null ||
+        selectedCurrency == _selectedCurrency) {
+      return;
+    }
+
+    await _saveCurrencyPreference(selectedCurrency);
+    if (!mounted) return;
+    SnackbarHelper.showSuccess(
+        context, 'Currency updated to $selectedCurrency');
+  }
+
+  Widget _buildLogoutButton() {
+    return SizedBox(
+      width: double.infinity,
+      height: 54,
+      child: ElevatedButton.icon(
+        onPressed: _isLoggingOut ? null : _logout,
+        icon: _isLoggingOut
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.2,
+                  color: Colors.white,
+                ),
+              )
+            : const Icon(AppIcons.logout),
+        label: Text(_isLoggingOut ? 'Logging out...' : 'Logout'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.error,
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: Theme.of(context).colorScheme.outlineVariant,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 0,
         ),
       ),
-      subtitle: subtitle != null
-          ? Text(
-              subtitle,
-              style: TextStyle(
-                  fontSize: 12,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant),
-            )
-          : null,
-      trailing: trailing ??
-          (onTap != null
-              ? Icon(AppIcons.chevron_right,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant)
-              : null),
-      onTap: onTap,
+    );
+  }
+
+  Widget _buildProfileAvatar(User user) {
+    final imageUrl = user.photoURL == null || user.photoURL!.isEmpty
+        ? null
+        : _optimizedProfileImageUrl(user.photoURL!);
+    final isLoading =
+        imageUrl != null && _isImageLoading && _cachedImageUrl != imageUrl;
+
+    return Container(
+      width: 86,
+      height: 86,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.45),
+          width: 2.4,
+        ),
+      ),
+      child: ClipOval(
+        child: imageUrl == null
+            ? Container(
+                color: Colors.white.withValues(alpha: 0.18),
+                child: const Icon(
+                  AppIcons.person,
+                  size: 40,
+                  color: Colors.white,
+                ),
+              )
+            : Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.network(
+                    imageUrl,
+                    fit: BoxFit.cover,
+                    cacheWidth: 200,
+                    cacheHeight: 200,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: Colors.white.withValues(alpha: 0.18),
+                      child: const Icon(
+                        AppIcons.person,
+                        size: 40,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  if (_isUploading || isLoading)
+                    Container(
+                      color: Colors.black.withValues(alpha: 0.34),
+                      alignment: Alignment.center,
+                      child: const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.4,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+      ),
     );
   }
 }
