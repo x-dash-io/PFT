@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:personal_finance_tracker/theme/app_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../helpers/database_helper.dart';
@@ -39,7 +40,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
   Future<void> _loadInitialData() async {
     if (_currentUser == null) return;
     if (mounted) setState(() => _isLoading = true);
-    
+
     // Load both transactions and categories
     final transactions = await dbHelper.getTransactions(_currentUser!.uid);
     final categories = await dbHelper.getCategories(_currentUser!.uid);
@@ -57,24 +58,29 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
   /// Applies all active filters (search, category, type, date range) to the transaction list
   void _applyAllFilters() {
     final query = _searchController.text.toLowerCase();
-    
+
     setState(() {
       _filteredTransactions = _allTransactions.where((transaction) {
         // Search filter
-        final descriptionMatch = transaction.description.toLowerCase().contains(query);
+        final descriptionMatch =
+            transaction.description.toLowerCase().contains(query);
         final amountMatch = transaction.amount.toString().contains(query);
         final searchMatch = query.isEmpty || descriptionMatch || amountMatch;
 
         // Category filter
-        final categoryMatch = _filterCategoryId == null || transaction.categoryId == _filterCategoryId;
+        final categoryMatch = _filterCategoryId == null ||
+            transaction.categoryId == _filterCategoryId;
 
         // Type filter
-        final typeMatch = _filterType == null || transaction.type == _filterType;
+        final typeMatch =
+            _filterType == null || transaction.type == _filterType;
 
         // Date range filter
         final dateMatch = _filterDateRange == null ||
-            (DateTime.parse(transaction.date).isAfter(_filterDateRange!.start) &&
-             DateTime.parse(transaction.date).isBefore(_filterDateRange!.end.add(const Duration(days: 1))));
+            (DateTime.parse(transaction.date)
+                    .isAfter(_filterDateRange!.start) &&
+                DateTime.parse(transaction.date).isBefore(
+                    _filterDateRange!.end.add(const Duration(days: 1))));
 
         return searchMatch && categoryMatch && typeMatch && dateMatch;
       }).toList();
@@ -99,25 +105,31 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
             return Padding(
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom,
-                top: 20, left: 20, right: 20,
+                top: 20,
+                left: 20,
+                right: 20,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Filter Transactions', style: Theme.of(context).textTheme.titleLarge),
+                  Text('Filter Transactions',
+                      style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 20),
 
                   // Filter by Type
                   DropdownButtonFormField<String>(
                     value: _filterType,
                     hint: const Text('Filter by Type'),
-                    decoration: const InputDecoration(border: OutlineInputBorder()),
+                    decoration:
+                        const InputDecoration(border: OutlineInputBorder()),
                     items: const [
                       DropdownMenuItem(value: 'income', child: Text('Income')),
-                      DropdownMenuItem(value: 'expense', child: Text('Expense')),
+                      DropdownMenuItem(
+                          value: 'expense', child: Text('Expense')),
                     ],
-                    onChanged: (value) => setModalState(() => _filterType = value),
+                    onChanged: (value) =>
+                        setModalState(() => _filterType = value),
                   ),
                   const SizedBox(height: 16),
 
@@ -125,31 +137,36 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                   DropdownButtonFormField<int>(
                     value: _filterCategoryId,
                     hint: const Text('Filter by Category'),
-                    decoration: const InputDecoration(border: OutlineInputBorder()),
-                    items: _allCategories.map((cat) => DropdownMenuItem(
-                      value: cat.id,
-                      child: Text(
-                        cat.name,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    )).toList(),
-                    onChanged: (value) => setModalState(() => _filterCategoryId = value),
+                    decoration:
+                        const InputDecoration(border: OutlineInputBorder()),
+                    items: _allCategories
+                        .map((cat) => DropdownMenuItem(
+                              value: cat.id,
+                              child: Text(
+                                cat.name,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ))
+                        .toList(),
+                    onChanged: (value) =>
+                        setModalState(() => _filterCategoryId = value),
                   ),
                   const SizedBox(height: 16),
 
                   // Filter by Date Range
                   ListTile(
                     title: Text(
-                      _filterDateRange == null 
-                        ? 'Filter by Date' 
+                      _filterDateRange == null
+                          ? 'Filter by Date'
                           : '${DateFormat.yMd().format(_filterDateRange!.start)} - ${DateFormat.yMd().format(_filterDateRange!.end)}',
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
-                    trailing: const Icon(Icons.calendar_today),
+                    trailing: const Icon(AppIcons.calendar_today),
                     onTap: () async {
-                      final picked = await DatePickerHelper.showModernDateRangePicker(
+                      final picked =
+                          await DatePickerHelper.showModernDateRangePicker(
                         context: context,
                         firstDate: DateTime(2020),
                         lastDate: DateTime.now().add(const Duration(days: 365)),
@@ -175,7 +192,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                           });
                           // Also clear the main state
                           setState(() {
-                             _filterCategoryId = null;
+                            _filterCategoryId = null;
                             _filterType = null;
                             _filterDateRange = null;
                           });
@@ -188,7 +205,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                       ElevatedButton(
                         onPressed: () {
                           // Apply the filters to the main screen's state
-                          setState(() {}); 
+                          setState(() {});
                           _applyAllFilters();
                           Navigator.pop(context);
                         },
@@ -208,14 +225,15 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormatter = NumberFormat.currency(locale: 'en_US', symbol: 'KSh ');
+    final currencyFormatter =
+        NumberFormat.currency(locale: 'en_US', symbol: 'KSh ');
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('All Transactions'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.filter_list),
+            icon: const Icon(AppIcons.filter_list),
             onPressed: _showFilterSheet,
             tooltip: 'Filter Transactions',
           ),
@@ -232,68 +250,94 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                     style: const TextStyle(color: Colors.black87, fontSize: 16),
                     decoration: InputDecoration(
                       hintText: 'Search by description or amount',
-                      prefixIcon: const Icon(Icons.search),
+                      prefixIcon: const Icon(AppIcons.search),
                       filled: true,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none,
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 16),
                     ),
                   ),
                 ),
                 Expanded(
                   child: _filteredTransactions.isEmpty
-                      ? const Center(child: Text('No transactions match your filters.'))
+                      ? const Center(
+                          child: Text('No transactions match your filters.'))
                       : ListView.builder(
                           itemCount: _filteredTransactions.length,
                           itemBuilder: (context, index) {
                             final transaction = _filteredTransactions[index];
                             final isIncome = transaction.type == 'income';
-                            final amountColor = isIncome ? const Color(0xFF4CAF50) : Colors.red;
+                            final amountColor =
+                                isIncome ? const Color(0xFF4CAF50) : Colors.red;
                             final amountPrefix = isIncome ? '+' : '-';
 
                             return Card(
-                              margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 6.0),
                               elevation: 1,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12)),
                               child: ListTile(
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 8),
                                 leading: Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
                                     color: amountColor.withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
-                                  child: Icon(isIncome ? Icons.arrow_downward : Icons.arrow_upward, color: amountColor, size: 20),
+                                  child: Icon(
+                                      isIncome
+                                          ? AppIcons.arrow_downward
+                                          : AppIcons.arrow_upward,
+                                      color: amountColor,
+                                      size: 20),
                                 ),
                                 title: Text(
-                                  transaction.description.isEmpty ? transaction.type.capitalize() : transaction.description,
-                                  style: const TextStyle(fontWeight: FontWeight.w500),
+                                  transaction.description.isEmpty
+                                      ? transaction.type.capitalize()
+                                      : transaction.description,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
-                                    ),
+                                ),
                                 subtitle: Padding(
                                   padding: const EdgeInsets.only(top: 4),
                                   child: Text(
                                     transaction.date.split('T')[0],
-                                      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12),
-                                    ),
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
+                                        fontSize: 12),
+                                  ),
                                 ),
                                 trailing: ConstrainedBox(
                                   constraints: BoxConstraints(
-                                    maxWidth: MediaQuery.of(context).size.width * 0.3,
+                                    maxWidth:
+                                        MediaQuery.of(context).size.width * 0.3,
                                   ),
                                   child: Text(
-                                  '$amountPrefix${currencyFormatter.format(transaction.amount)}',
-                                    style: TextStyle(color: amountColor, fontWeight: FontWeight.bold, fontSize: 16),
+                                    '$amountPrefix${currencyFormatter.format(transaction.amount)}',
+                                    style: TextStyle(
+                                        color: amountColor,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16),
                                     overflow: TextOverflow.ellipsis,
                                     textAlign: TextAlign.end,
                                   ),
                                 ),
                                 onTap: () async {
-                                  final result = await Navigator.of(context).push<bool>(
-                                    MaterialPageRoute(builder: (context) => TransactionDetailScreen(transaction: transaction)),
+                                  final result =
+                                      await Navigator.of(context).push<bool>(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            TransactionDetailScreen(
+                                                transaction: transaction)),
                                   );
                                   if (result == true) {
                                     _loadInitialData(); // Use the full reload to get fresh data
@@ -316,4 +360,3 @@ extension on String {
     return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
   }
 }
-

@@ -51,14 +51,13 @@ FINTECH_UI_DESIGN_GUIDE.md                  (Designer/Developer reference guide)
    - Modern FAB styling
    - AppColors integration throughout
 
-3. All Screen Files (12 files)
+3. All Screen Files (11 files)
    - Added AppTheme imports to:
      - add_transaction_screen.dart
      - add_bill_screen.dart
      - all_transactions_screen.dart
      - edit_bill_screen.dart
      - manage_categories_screen.dart
-     - passcode_screen.dart
      - transaction_detail_screen.dart
      - welcome_screen.dart
      - login_screen.dart

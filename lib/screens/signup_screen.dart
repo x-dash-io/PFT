@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:personal_finance_tracker/theme/app_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -11,7 +12,8 @@ class SignUpScreen extends StatefulWidget {
   State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderStateMixin {
+class _SignUpScreenState extends State<SignUpScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -55,7 +57,8 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
       );
 
       if (_nameController.text.trim().isNotEmpty) {
-        await userCredential.user?.updateDisplayName(_nameController.text.trim());
+        await userCredential.user
+            ?.updateDisplayName(_nameController.text.trim());
       }
 
       Fluttertoast.showToast(msg: "Account Created Successfully!");
@@ -125,8 +128,9 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.2),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic));
-    
+    ).animate(CurvedAnimation(
+        parent: _animationController, curve: Curves.easeOutCubic));
+
     _animationController.forward();
   }
 
@@ -150,7 +154,7 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
         statusBarBrightness: Brightness.light,
       ),
     );
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -167,7 +171,8 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_rounded, color: Colors.black87),
+                      icon: const Icon(AppIcons.arrow_back_rounded,
+                          color: Colors.black87),
                       onPressed: () => Navigator.pop(context),
                       style: IconButton.styleFrom(
                         backgroundColor: Colors.grey[100],
@@ -196,7 +201,7 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
                         ),
                         child: const Center(
                           child: Icon(
-                            Icons.person_add_rounded,
+                            AppIcons.person_add_rounded,
                             color: Colors.white,
                             size: 32,
                           ),
@@ -257,7 +262,8 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
                       TextFormField(
                         controller: _nameController,
                         keyboardType: TextInputType.name,
-                        style: const TextStyle(color: Colors.black87, fontSize: 16),
+                        style: const TextStyle(
+                            color: Colors.black87, fontSize: 16),
                         decoration: InputDecoration(
                           hintText: 'Enter your full name',
                           hintStyle: TextStyle(color: Colors.grey[400]),
@@ -271,7 +277,7 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(
-                              Icons.person_outline,
+                              AppIcons.person_outline,
                               color: Color(0xFF4CAF50),
                               size: 20,
                             ),
@@ -326,7 +332,8 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
                       TextFormField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
-                        style: const TextStyle(color: Colors.black87, fontSize: 16),
+                        style: const TextStyle(
+                            color: Colors.black87, fontSize: 16),
                         decoration: InputDecoration(
                           hintText: 'Enter your email address',
                           hintStyle: TextStyle(color: Colors.grey[400]),
@@ -340,7 +347,7 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(
-                              Icons.email_outlined,
+                              AppIcons.email_outlined,
                               color: Color(0xFF4CAF50),
                               size: 20,
                             ),
@@ -398,7 +405,8 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
                       TextFormField(
                         controller: _passwordController,
                         obscureText: !_isPasswordVisible,
-                        style: const TextStyle(color: Colors.black87, fontSize: 16),
+                        style: const TextStyle(
+                            color: Colors.black87, fontSize: 16),
                         decoration: InputDecoration(
                           hintText: 'Create a strong password',
                           hintStyle: TextStyle(color: Colors.grey[400]),
@@ -412,7 +420,7 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(
-                              Icons.lock_outline,
+                              AppIcons.lock_outline,
                               color: Color(0xFF4CAF50),
                               size: 20,
                             ),
@@ -439,8 +447,8 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isPasswordVisible
-                                  ? Icons.visibility_off_rounded
-                                  : Icons.visibility_rounded,
+                                  ? AppIcons.visibility_off_rounded
+                                  : AppIcons.visibility_rounded,
                               color: Colors.grey[600],
                             ),
                             onPressed: () {
@@ -483,7 +491,8 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
                       TextFormField(
                         controller: _confirmPasswordController,
                         obscureText: !_isConfirmPasswordVisible,
-                        style: const TextStyle(color: Colors.black87, fontSize: 16),
+                        style: const TextStyle(
+                            color: Colors.black87, fontSize: 16),
                         decoration: InputDecoration(
                           hintText: 'Re-enter your password',
                           hintStyle: TextStyle(color: Colors.grey[400]),
@@ -497,7 +506,7 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(
-                              Icons.lock_outline,
+                              AppIcons.lock_outline,
                               color: Color(0xFF4CAF50),
                               size: 20,
                             ),
@@ -524,8 +533,8 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isConfirmPasswordVisible
-                                  ? Icons.visibility_off_rounded
-                                  : Icons.visibility_rounded,
+                                  ? AppIcons.visibility_off_rounded
+                                  : AppIcons.visibility_rounded,
                               color: Colors.grey[600],
                             ),
                             onPressed: () {
@@ -601,7 +610,8 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
                   opacity: _fadeAnimation,
                   child: ScaleTransition(
                     scale: Tween<double>(begin: 0.9, end: 1.0).animate(
-                      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+                      CurvedAnimation(
+                          parent: _animationController, curve: Curves.easeOut),
                     ),
                     child: SizedBox(
                       width: double.infinity,
@@ -639,7 +649,8 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
                                     ),
                                   ),
                                   SizedBox(width: 8),
-                                  Icon(Icons.arrow_forward_rounded, size: 20),
+                                  Icon(AppIcons.arrow_forward_rounded,
+                                      size: 20),
                                 ],
                               ),
                       ),

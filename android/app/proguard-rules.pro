@@ -6,11 +6,6 @@
 -keep class io.flutter.** { *; }
 -keep class io.flutter.plugins.** { *; }
 
-# Rules for the local_auth plugin to prevent code shrinking issues.
--keep class androidx.core.content.ContextCompat
--keep class androidx.fragment.app.FragmentActivity
--keep class androidx.biometric.BiometricPrompt
-
 # NEW: Keep rules for Flutter's Google Play Core dependencies
 -keep class com.google.android.play.core.** { *; }
 # Please add these rules to your existing keep rules in order to suppress warnings.

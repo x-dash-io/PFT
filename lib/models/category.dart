@@ -49,7 +49,8 @@ class Category {
     return Category(
       id: map['id'],
       name: map['name'],
-      type: map['type'] ?? 'expense', // Safely handle older data that might not have a type
+      type: map['type'] ??
+          'expense', // Safely handle older data that might not have a type
       iconCodePoint: map['iconCodePoint'],
       colorValue: map['colorValue'],
     );

@@ -215,8 +215,8 @@ class PdfHelper {
                 savingsRate >= 20
                     ? PdfColors.green700
                     : (savingsRate >= 10
-                          ? PdfColors.orange700
-                          : PdfColors.red700),
+                        ? PdfColors.orange700
+                        : PdfColors.red700),
                 0,
               ),
               pw.SizedBox(width: 12),

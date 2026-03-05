@@ -50,7 +50,8 @@ class Bill {
       'name': name,
       'amount': amount,
       'dueDate': dueDate.toIso8601String(),
-      'isRecurring': isRecurring ? 1 : 0, // Convert boolean to integer for SQLite storage
+      'isRecurring':
+          isRecurring ? 1 : 0, // Convert boolean to integer for SQLite storage
       'recurrenceType': recurrenceType,
       'recurrenceValue': recurrenceValue,
     };

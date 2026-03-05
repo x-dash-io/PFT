@@ -55,7 +55,7 @@ The Personal Finance Tracker (PFT) is a cross-platform Flutter application that 
 └──────────────────┘           └────────────────────┘
 ```
 
-- **Authentication flow:** `AuthGate` listens to Firebase auth stream, then defers to `PasscodeScreen` when local lock is enabled.
+- **Authentication flow:** `AuthGate` listens to Firebase auth stream and routes users to either the welcome or main screen.
 - **Data flow:** Transactions, bills, and categories are stored locally (SQLite) for offline use, then mirrored to Cloud Firestore per authenticated user.
 - **Images:** Uploaded to Cloudinary with signed URLs and cache-busting headers to prevent stale profile photos.
 - **Notifications:** Managed through `flutter_local_notifications` with bill reminders scheduled from SQLite data.
@@ -85,7 +85,7 @@ The Personal Finance Tracker (PFT) is a cross-platform Flutter application that 
 
 ```
 lib/
-├── auth_gate.dart                # Auth + passcode routing
+├── auth_gate.dart                # Auth routing
 ├── main.dart                     # App shell, navigation, theming
 ├── firebase_options.dart         # Generated Firebase config
 │
@@ -113,8 +113,7 @@ lib/
     ├── manage_categories_screen.dart
     ├── add_bill_screen.dart
     ├── reports_screen.dart
-    ├── profile_screen.dart
-    └── passcode_screen.dart
+    └── profile_screen.dart
 ```
 
 ---
@@ -128,7 +127,7 @@ lib/
 | Bills | Recurrence, reminders, paid history | `add_bill_screen.dart`, `notification_service.dart` |
 | Reports | Income vs expense, category breakdown, PDF export | `reports_screen.dart`, `pdf_helper.dart` |
 | Profile | Photo upload (Cloudinary), currency, WhatsApp support | `profile_screen.dart`, `config.dart` |
-| Security | Firebase Auth, passcode unlock, optional biometrics | `auth_gate.dart`, `passcode_screen.dart` |
+| Security | Firebase Auth session handling | `auth_gate.dart` |
 
 UX staples include consistent input theming, animated dialogs, loading overlays, disabled buttons during network calls, and Snackbar-driven feedback.
 

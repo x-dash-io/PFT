@@ -25,7 +25,9 @@ class NotificationService {
 
   Future<void> scheduleBillNotification(Bill bill) async {
     // Schedule notification for one day before the due date at 9:00 AM
-    final scheduleTime = tz.TZDateTime.from(bill.dueDate, tz.local).subtract(const Duration(days: 1)).add(const Duration(hours: 9));
+    final scheduleTime = tz.TZDateTime.from(bill.dueDate, tz.local)
+        .subtract(const Duration(days: 1))
+        .add(const Duration(hours: 9));
 
     // Ensure the scheduled time is in the future
     if (scheduleTime.isBefore(DateTime.now())) {
@@ -44,7 +46,7 @@ class NotificationService {
 
     const NotificationDetails notificationDetails =
         NotificationDetails(android: androidNotificationDetails);
-        
+
     await flutterLocalNotificationsPlugin.zonedSchedule(
       bill.id!,
       'Upcoming Bill Reminder',

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:personal_finance_tracker/theme/app_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -118,18 +119,18 @@ class _MainScreenState extends State<MainScreen> {
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         destinations: const <NavigationDestination>[
           NavigationDestination(
-            icon: Icon(Icons.account_balance_wallet_outlined),
-            selectedIcon: Icon(Icons.account_balance_wallet),
+            icon: Icon(AppIcons.account_balance_wallet_outlined),
+            selectedIcon: Icon(AppIcons.account_balance_wallet),
             label: 'Home',
           ),
           NavigationDestination(
-            icon: Icon(Icons.analytics_outlined),
-            selectedIcon: Icon(Icons.analytics),
+            icon: Icon(AppIcons.analytics_outlined),
+            selectedIcon: Icon(AppIcons.analytics),
             label: 'Reports',
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
+            icon: Icon(AppIcons.person_outline),
+            selectedIcon: Icon(AppIcons.person),
             label: 'Profile',
           ),
         ],

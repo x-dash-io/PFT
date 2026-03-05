@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:personal_finance_tracker/theme/app_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../helpers/dialog_helper.dart';
-import '../theme/app_theme.dart';
 import '../auth_gate.dart';
 import 'signup_screen.dart';
 
@@ -13,7 +13,8 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
+class _LoginScreenState extends State<LoginScreen>
+    with SingleTickerProviderStateMixin {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _auth = FirebaseAuth.instance;
@@ -39,86 +40,105 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      
+
       // Let Firebase emit auth state change before navigating
       await Future.delayed(const Duration(milliseconds: 200));
-      
+
       if (!mounted) return;
-      
+
       setState(() {
         _isLoading = false;
       });
-      
-      // Relaunch AuthGate so it can route to MainScreen or Passcode screen
+
+      // Relaunch AuthGate so it can route to the correct signed-in screen.
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const AuthGate()),
         (route) => false,
       );
     } on FirebaseAuthException catch (e) {
       String errorMessage = 'Unable to sign in. Please try again.';
-      
+
       switch (e.code) {
         case 'user-not-found':
-          errorMessage = 'No account found with this email address. Please check your email or sign up for a new account.';
+          errorMessage =
+              'No account found with this email address. Please check your email or sign up for a new account.';
           break;
         case 'wrong-password':
-          errorMessage = 'Incorrect password. Please check your password and try again.';
+          errorMessage =
+              'Incorrect password. Please check your password and try again.';
           break;
         case 'invalid-email':
-          errorMessage = 'Invalid email address. Please enter a valid email address.';
+          errorMessage =
+              'Invalid email address. Please enter a valid email address.';
           break;
         case 'invalid-credential':
         case 'invalid-verification-code':
         case 'invalid-verification-id':
-          errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+          errorMessage =
+              'Invalid email or password. Please check your credentials and try again.';
           break;
         case 'user-disabled':
-          errorMessage = 'This account has been disabled. Please contact support for assistance.';
+          errorMessage =
+              'This account has been disabled. Please contact support for assistance.';
           break;
         case 'too-many-requests':
-          errorMessage = 'Too many failed login attempts. Please wait a few minutes and try again.';
+          errorMessage =
+              'Too many failed login attempts. Please wait a few minutes and try again.';
           break;
         case 'network-request-failed':
         case 'network-error':
-          errorMessage = 'Network connection failed. Please check your internet connection and try again.';
+          errorMessage =
+              'Network connection failed. Please check your internet connection and try again.';
           break;
         case 'operation-not-allowed':
-          errorMessage = 'Email/password sign-in is not enabled. Please contact support.';
+          errorMessage =
+              'Email/password sign-in is not enabled. Please contact support.';
           break;
         case 'email-already-in-use':
-          errorMessage = 'This email is already registered. Please sign in instead.';
+          errorMessage =
+              'This email is already registered. Please sign in instead.';
           break;
         case 'weak-password':
-          errorMessage = 'Password is too weak. Please use a stronger password.';
+          errorMessage =
+              'Password is too weak. Please use a stronger password.';
           break;
         case 'requires-recent-login':
           errorMessage = 'Please sign out and sign in again to continue.';
           break;
         case 'credential-already-in-use':
-          errorMessage = 'This account is already linked to another sign-in method.';
+          errorMessage =
+              'This account is already linked to another sign-in method.';
           break;
         case 'invalid-action-code':
           errorMessage = 'Invalid verification code. Please request a new one.';
           break;
         case 'expired-action-code':
-          errorMessage = 'Verification code has expired. Please request a new one.';
+          errorMessage =
+              'Verification code has expired. Please request a new one.';
           break;
         default:
           // Try to extract a user-friendly message from Firebase's error message
           final firebaseMessage = e.message?.toLowerCase() ?? '';
           if (firebaseMessage.contains('password')) {
-            errorMessage = 'Incorrect password. Please check your password and try again.';
+            errorMessage =
+                'Incorrect password. Please check your password and try again.';
           } else if (firebaseMessage.contains('email')) {
-            errorMessage = 'Invalid email address. Please check your email and try again.';
-          } else if (firebaseMessage.contains('network') || firebaseMessage.contains('connection')) {
-            errorMessage = 'Network error. Please check your internet connection and try again.';
-          } else if (firebaseMessage.contains('user') && firebaseMessage.contains('not found')) {
-            errorMessage = 'No account found with this email address. Please sign up for a new account.';
+            errorMessage =
+                'Invalid email address. Please check your email and try again.';
+          } else if (firebaseMessage.contains('network') ||
+              firebaseMessage.contains('connection')) {
+            errorMessage =
+                'Network error. Please check your internet connection and try again.';
+          } else if (firebaseMessage.contains('user') &&
+              firebaseMessage.contains('not found')) {
+            errorMessage =
+                'No account found with this email address. Please sign up for a new account.';
           } else {
-            errorMessage = 'Unable to sign in. Please check your email and password and try again.';
+            errorMessage =
+                'Unable to sign in. Please check your email and password and try again.';
           }
       }
-      
+
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -131,7 +151,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           _isLoading = false;
         });
         // Provide a user-friendly generic error message
-        SnackbarHelper.showError(context, 'Something went wrong. Please check your internet connection and try again.');
+        SnackbarHelper.showError(context,
+            'Something went wrong. Please check your internet connection and try again.');
       }
     }
   }
@@ -149,8 +170,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.2),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic));
-    
+    ).animate(CurvedAnimation(
+        parent: _animationController, curve: Curves.easeOutCubic));
+
     _animationController.forward();
   }
 
@@ -172,27 +194,27 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         statusBarBrightness: Brightness.light,
       ),
     );
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Colors.black87),
+          icon: const Icon(AppIcons.arrow_back_rounded, color: Colors.black87),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 20),
-                  // Logo with animation
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 20),
+                // Logo with animation
                 FadeTransition(
                   opacity: _fadeAnimation,
                   child: SlideTransition(
@@ -218,7 +240,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         ),
                         child: const Center(
                           child: Icon(
-                            Icons.account_balance_wallet_rounded,
+                            AppIcons.account_balance_wallet_rounded,
                             color: Colors.white,
                             size: 50,
                           ),
@@ -279,7 +301,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       TextFormField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
-                        style: const TextStyle(color: Colors.black87, fontSize: 16),
+                        style: const TextStyle(
+                            color: Colors.black87, fontSize: 16),
                         decoration: InputDecoration(
                           hintText: 'Enter your email address',
                           hintStyle: TextStyle(color: Colors.grey[400]),
@@ -293,7 +316,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(
-                              Icons.email_outlined,
+                              AppIcons.email_outlined,
                               color: Color(0xFF4CAF50),
                               size: 20,
                             ),
@@ -326,7 +349,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             return 'Please enter a valid email address (e.g., name@example.com)';
                           }
                           // Basic email format validation
-                          final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                          final emailRegex =
+                              RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
                           if (!emailRegex.hasMatch(value.trim())) {
                             return 'Please enter a valid email address';
                           }
@@ -356,7 +380,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       TextFormField(
                         controller: _passwordController,
                         obscureText: !_isPasswordVisible,
-                        style: const TextStyle(color: Colors.black87, fontSize: 16),
+                        style: const TextStyle(
+                            color: Colors.black87, fontSize: 16),
                         decoration: InputDecoration(
                           hintText: 'Enter your password',
                           hintStyle: TextStyle(color: Colors.grey[400]),
@@ -370,7 +395,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(
-                              Icons.lock_outline,
+                              AppIcons.lock_outline,
                               color: Color(0xFF4CAF50),
                               size: 20,
                             ),
@@ -397,8 +422,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isPasswordVisible
-                                  ? Icons.visibility_off_rounded
-                                  : Icons.visibility_rounded,
+                                  ? AppIcons.visibility_off_rounded
+                                  : AppIcons.visibility_rounded,
                               color: Colors.grey[600],
                             ),
                             onPressed: () {
@@ -427,7 +452,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   opacity: _fadeAnimation,
                   child: ScaleTransition(
                     scale: Tween<double>(begin: 0.9, end: 1.0).animate(
-                      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+                      CurvedAnimation(
+                          parent: _animationController, curve: Curves.easeOut),
                     ),
                     child: SizedBox(
                       width: double.infinity,
@@ -465,7 +491,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                     ),
                                   ),
                                   SizedBox(width: 8),
-                                  Icon(Icons.arrow_forward_rounded, size: 20),
+                                  Icon(AppIcons.arrow_forward_rounded,
+                                      size: 20),
                                 ],
                               ),
                       ),

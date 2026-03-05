@@ -59,7 +59,7 @@
 //         .snapshots()
 //         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
 //   }
-  
+
 //   // Category ID handling may need adjustment in future iterations
 
 //   // --- Savings Functions ---
@@ -82,7 +82,7 @@
 //             .map((doc) => SavingsGoal.fromMap(doc.data(), id: doc.id))
 //             .toList());
 //   }
-  
+
 //   Future<void> updateSavingsGoal(SavingsGoal goal, String userId) {
 //      return _db
 //         .collection('users')
@@ -122,7 +122,7 @@
 //             .map((doc) => Bill.fromMap(doc.data(), id: doc.id))
 //             .toList());
 //   }
-  
+
 //   Future<void> deleteBill(String billId, String userId) {
 //     return _db
 //         .collection('users')

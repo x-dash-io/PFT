@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:personal_finance_tracker/theme/app_icons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../helpers/database_helper.dart';
 import '../helpers/dialog_helper.dart';
 import '../models/category.dart';
-import '../theme/app_theme.dart';
 
 class ManageCategoriesScreen extends StatefulWidget {
   const ManageCategoriesScreen({super.key});
@@ -22,32 +22,61 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
   List<Category> _incomeCategories = [];
   bool _isLoading = true;
   bool _isDeleting = false;
-  Set<int> _deletingCategoryIds = {}; // Track which categories are being deleted
+  Set<int> _deletingCategoryIds =
+      {}; // Track which categories are being deleted
   IconData? _selectedIconForDialog;
   ValueNotifier<bool>? _dialogLoadingState;
 
   final _nameController = TextEditingController();
   static const List<IconData> _selectableIcons = [
-    Icons.shopping_cart,
-    Icons.restaurant,
-    Icons.house,
-    Icons.flight,
-    Icons.receipt,
-    Icons.local_hospital,
-    Icons.school,
-    Icons.pets,
-    Icons.phone_android,
-    Icons.wifi,
-    Icons.movie,
-    Icons.spa,
-    Icons.build,
-    Icons.book,
-    Icons.music_note,
-    Icons.directions_car,
-    Icons.attach_money,
-    Icons.work,
-    Icons.card_giftcard,
-    Icons.savings,
+    AppIcons.shopping_cart,
+    AppIcons.restaurant,
+    AppIcons.house,
+    AppIcons.flight,
+    AppIcons.receipt,
+    AppIcons.local_hospital,
+    AppIcons.school,
+    AppIcons.pets,
+    AppIcons.phone_android,
+    AppIcons.wifi,
+    AppIcons.movie,
+    AppIcons.spa,
+    AppIcons.build,
+    AppIcons.book,
+    AppIcons.music_note,
+    AppIcons.directions_car,
+    AppIcons.attach_money,
+    AppIcons.work,
+    AppIcons.card_giftcard,
+    AppIcons.savings,
+    AppIcons.category,
+    AppIcons.source,
+    AppIcons.label,
+    AppIcons.security,
+    AppIcons.favorite,
+    AppIcons.support_agent,
+    AppIcons.water_drop_outlined,
+    AppIcons.lightbulb_outline,
+    AppIcons.cloud_done,
+    AppIcons.backup,
+    AppIcons.notifications,
+    AppIcons.analytics,
+    AppIcons.insights_outlined,
+    AppIcons.account_balance_wallet,
+    AppIcons.account_balance,
+    AppIcons.credit_card_outlined,
+    AppIcons.filter_list,
+    AppIcons.search,
+    AppIcons.repeat,
+    AppIcons.sync,
+    AppIcons.question_answer_outlined,
+    AppIcons.chevron_right,
+    AppIcons.calendar_today,
+    AppIcons.person_outline,
+    AppIcons.lock_outline,
+    AppIcons.money,
+    AppIcons.offline_bolt,
+    AppIcons.picture_as_pdf,
   ];
 
   @override
@@ -73,12 +102,12 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
           await dbHelper.getCategories(currentUser!.uid, type: 'expense');
       final incomeCats =
           await dbHelper.getCategories(currentUser!.uid, type: 'income');
-    if (mounted) {
-      setState(() {
-        _expenseCategories = expenseCats;
-        _incomeCategories = incomeCats;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _expenseCategories = expenseCats;
+          _incomeCategories = incomeCats;
+          _isLoading = false;
+        });
       }
     } catch (e) {
       if (mounted) {
@@ -90,20 +119,20 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
 
   IconData _getIconForCategory(Category category) {
     if (category.iconCodePoint != null) {
-      return IconData(category.iconCodePoint!, fontFamily: 'MaterialIcons');
+      return AppIcons.fromCodePoint(category.iconCodePoint!);
     }
-    return Icons.label;
+    return AppIcons.label;
   }
 
   void _showCategoryDialog({Category? category, required String type}) {
     _nameController.text = category?.name ?? '';
     _selectedIconForDialog = category?.iconCodePoint != null
-        ? IconData(category!.iconCodePoint!, fontFamily: 'MaterialIcons')
-        : (type == 'expense' ? Icons.category : Icons.source);
+        ? AppIcons.fromCodePoint(category!.iconCodePoint!)
+        : (type == 'expense' ? AppIcons.category : AppIcons.source);
 
     // Create loading state once for this dialog
     _dialogLoadingState = ValueNotifier<bool>(false);
-    
+
     // Store the screen's context before showing dialog
     final screenContext = context;
 
@@ -113,7 +142,7 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
           ? 'Add ${type.capitalize()} Category'
           : 'Edit Category',
       content: StatefulBuilder(
-          builder: (context, setDialogState) {
+        builder: (context, setDialogState) {
           return Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,19 +177,19 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                   ),
                 ),
               ),
-                  const SizedBox(height: 20),
+              const SizedBox(height: 20),
               GestureDetector(
-                    onTap: () async {
-                      final IconData? newIcon = await showDialog<IconData>(
+                onTap: () async {
+                  final IconData? newIcon = await showDialog<IconData>(
                     context: context,
                     builder: (context) => _buildIconPickerDialog(),
                   );
-                      if (newIcon != null) {
+                  if (newIcon != null) {
                     setDialogState(() {
                       _selectedIconForDialog = newIcon;
                     });
-                      }
-                    },
+                  }
+                },
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -193,7 +222,7 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                           ),
                         ),
                       ),
-                      Icon(Icons.chevron_right, color: Colors.grey[600]),
+                      Icon(AppIcons.chevron_right, color: Colors.grey[600]),
                     ],
                   ),
                 ),
@@ -201,8 +230,8 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
             ],
           );
         },
-              ),
-              actions: [
+      ),
+      actions: [
         ValueListenableBuilder<bool>(
           valueListenable: _dialogLoadingState!,
           builder: (context, isSaving, _) {
@@ -210,11 +239,13 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
-                  onPressed: isSaving ? null : () {
-                    _dialogLoadingState?.dispose();
-                    _dialogLoadingState = null;
-                    Navigator.pop(context);
-                  },
+                  onPressed: isSaving
+                      ? null
+                      : () {
+                          _dialogLoadingState?.dispose();
+                          _dialogLoadingState = null;
+                          Navigator.pop(context);
+                        },
                   child: Text(
                     'Cancel',
                     style: TextStyle(
@@ -238,45 +269,49 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                           try {
                             bool success = false;
                             String message = '';
-                            
-                      if (category == null) {
-                        final newCategory = Category(
-                          name: _nameController.text.trim(),
-                                iconCodePoint: _selectedIconForDialog?.codePoint,
-                          type: type,
-                        );
+
+                            if (category == null) {
+                              final newCategory = Category(
+                                name: _nameController.text.trim(),
+                                iconCodePoint:
+                                    _selectedIconForDialog?.codePoint,
+                                type: type,
+                              );
                               await dbHelper.addCategory(
                                   newCategory, currentUser!.uid);
                               // addCategory now throws exception on failure, so if we get here, it succeeded
                               success = true;
                               message = 'Category added successfully!';
-                      } else {
+                            } else {
                               // Ensure we preserve the category ID when updating
                               if (category.id == null) {
-                                throw Exception('Cannot update category without ID');
+                                throw Exception(
+                                    'Cannot update category without ID');
                               }
-                        final updatedCategory = category.copyWith(
-                          name: _nameController.text.trim(),
-                                iconCodePoint: _selectedIconForDialog?.codePoint,
-                        );
+                              final updatedCategory = category.copyWith(
+                                name: _nameController.text.trim(),
+                                iconCodePoint:
+                                    _selectedIconForDialog?.codePoint,
+                              );
                               await dbHelper.updateCategory(
                                   updatedCategory, currentUser!.uid);
                               // updateCategory throws exception on failure, so if we get here, it succeeded
                               success = true;
                               message = 'Category updated successfully!';
                             }
-                            
+
                             if (success && mounted) {
                               // Dispose loading state
                               _dialogLoadingState?.dispose();
                               _dialogLoadingState = null;
                               // Close dialog
-                      Navigator.pop(context);
+                              Navigator.pop(context);
                               // Refresh categories and show success using screen context
                               if (mounted) {
                                 await _refreshCategories();
-                                SnackbarHelper.showSuccess(screenContext, message);
-                    }
+                                SnackbarHelper.showSuccess(
+                                    screenContext, message);
+                              }
                             }
                           } catch (e) {
                             if (mounted) {
@@ -290,7 +325,8 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                     backgroundColor: const Color(0xFF4CAF50),
                     foregroundColor: Colors.white,
                     disabledBackgroundColor: Colors.grey[300],
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -318,10 +354,6 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
   }
 
   Widget _buildIconPickerDialog() {
-    // Calculate grid height based on number of icons
-    final rows = (_selectableIcons.length / 4).ceil();
-    final gridHeight = (rows * 60.0) + ((rows - 1) * 16.0); // 60px per row + spacing
-    
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
@@ -333,7 +365,7 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
@@ -345,41 +377,36 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                 ),
               ),
               const SizedBox(height: 20),
-              Flexible(
-                child: SingleChildScrollView(
-                  child: SizedBox(
-                    width: double.maxFinite,
-                    height: gridHeight,
-                    child: GridView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 4,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: 1.0,
-                      ),
-                      itemCount: _selectableIcons.length,
-                      itemBuilder: (context, index) {
-                        final icon = _selectableIcons[index];
-                        return InkWell(
-                          onTap: () => Navigator.of(context).pop(icon),
-                          borderRadius: BorderRadius.circular(12),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.grey[50],
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.grey[300]!),
-                            ),
-                            child: Icon(
-                              icon,
-                              size: 28,
-                              color: const Color(0xFF4CAF50),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+              Expanded(
+                child: GridView.builder(
+                  padding: EdgeInsets.zero,
+                  physics: const BouncingScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 1.0,
                   ),
+                  itemCount: _selectableIcons.length,
+                  itemBuilder: (context, index) {
+                    final icon = _selectableIcons[index];
+                    return InkWell(
+                      onTap: () => Navigator.of(context).pop(icon),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey[300]!),
+                        ),
+                        child: Icon(
+                          icon,
+                          size: 28,
+                          color: const Color(0xFF4CAF50),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 20),
@@ -421,7 +448,7 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                Icons.category_outlined,
+                AppIcons.category_outlined,
                 size: 64,
                 color: Colors.grey[400],
               ),
@@ -490,13 +517,14 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.edit_outlined, color: Colors.grey),
-                  onPressed: _isDeleting || _deletingCategoryIds.contains(category.id)
-                      ? null
-                      : () => _showCategoryDialog(
-                            category: category,
-                            type: category.type,
-                          ),
+                  icon: const Icon(AppIcons.edit_outlined, color: Colors.grey),
+                  onPressed:
+                      _isDeleting || _deletingCategoryIds.contains(category.id)
+                          ? null
+                          : () => _showCategoryDialog(
+                                category: category,
+                                type: category.type,
+                              ),
                   tooltip: 'Edit Category',
                 ),
                 IconButton(
@@ -509,20 +537,23 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                             color: Colors.red,
                           ),
                         )
-                      : const Icon(Icons.delete_outline, color: Colors.red),
-                  onPressed: _isDeleting || _deletingCategoryIds.contains(category.id)
+                      : const Icon(AppIcons.delete_outline, color: Colors.red),
+                  onPressed: _isDeleting ||
+                          _deletingCategoryIds.contains(category.id)
                       ? null
                       : () async {
                           final bool? confirm =
                               await DialogHelper.showConfirmDialog(
-                      context: context,
+                            context: context,
                             title: 'Delete Category',
                             message:
                                 'Are you sure you want to delete "${category.name}"? This action cannot be undone.',
                             confirmText: 'Delete',
                             confirmColor: Colors.red,
-                    );
-                          if (confirm == true && currentUser != null && category.id != null) {
+                          );
+                          if (confirm == true &&
+                              currentUser != null &&
+                              category.id != null) {
                             setState(() {
                               _deletingCategoryIds.add(category.id!);
                             });
@@ -531,8 +562,8 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                                   category.id!, currentUser!.uid);
                               if (mounted) {
                                 await _refreshCategories();
-                                SnackbarHelper.showSuccess(context,
-                                    'Category deleted successfully!');
+                                SnackbarHelper.showSuccess(
+                                    context, 'Category deleted successfully!');
                               }
                             } catch (e) {
                               if (mounted) {
@@ -546,8 +577,8 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                                 });
                               }
                             }
-                    }
-                  },
+                          }
+                        },
                   tooltip: 'Delete Category',
                 ),
               ],
@@ -566,7 +597,7 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: const Icon(AppIcons.arrow_back, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
@@ -601,13 +632,13 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
         onPressed: _isDeleting
             ? null
             : () {
-          final type = _tabController.index == 0 ? 'expense' : 'income';
-          _showCategoryDialog(type: type);
-        },
+                final type = _tabController.index == 0 ? 'expense' : 'income';
+                _showCategoryDialog(type: type);
+              },
         backgroundColor: const Color(0xFF4CAF50),
         foregroundColor: Colors.white,
         label: const Text('Add Category'),
-        icon: const Icon(Icons.add),
+        icon: const Icon(AppIcons.add),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),

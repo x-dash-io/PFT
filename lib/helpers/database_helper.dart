@@ -81,24 +81,29 @@ class DatabaseHelper {
       await db.execute('ALTER TABLE bills ADD COLUMN userId TEXT');
     }
     if (oldVersion < 4) {
-      await db.execute('ALTER TABLE categories ADD COLUMN iconCodePoint INTEGER');
+      await db
+          .execute('ALTER TABLE categories ADD COLUMN iconCodePoint INTEGER');
       await db.execute('ALTER TABLE categories ADD COLUMN colorValue INTEGER');
     }
     if (oldVersion < 5) {
-      await db.execute('ALTER TABLE bills ADD COLUMN isRecurring INTEGER NOT NULL DEFAULT 0');
+      await db.execute(
+          'ALTER TABLE bills ADD COLUMN isRecurring INTEGER NOT NULL DEFAULT 0');
       await db.execute('ALTER TABLE bills ADD COLUMN recurrenceType TEXT');
       await db.execute('ALTER TABLE bills ADD COLUMN recurrenceValue INTEGER');
     }
     if (oldVersion < 6) {
-      await db.execute("ALTER TABLE transactions ADD COLUMN tag TEXT NOT NULL DEFAULT 'business'");
+      await db.execute(
+          "ALTER TABLE transactions ADD COLUMN tag TEXT NOT NULL DEFAULT 'business'");
     }
     if (oldVersion < 7) {
-      await db.execute("ALTER TABLE categories ADD COLUMN type TEXT NOT NULL DEFAULT 'expense'");
+      await db.execute(
+          "ALTER TABLE categories ADD COLUMN type TEXT NOT NULL DEFAULT 'expense'");
     }
     if (oldVersion < 8) {
       // Migrate: Convert all 'business' tags to 'personal' (for data consistency)
-      await db.execute("UPDATE transactions SET tag = 'personal' WHERE tag = 'business'");
-      
+      await db.execute(
+          "UPDATE transactions SET tag = 'personal' WHERE tag = 'business'");
+
       // Remove tag column by recreating the table
       await db.execute('''
         CREATE TABLE transactions_new(
@@ -111,14 +116,14 @@ class DatabaseHelper {
           userId TEXT NOT NULL
         )
       ''');
-      
+
       // Copy data from old table to new table (excluding tag column)
       await db.execute('''
         INSERT INTO transactions_new (id, type, amount, description, date, category_id, userId)
         SELECT id, type, amount, description, date, category_id, userId
         FROM transactions
       ''');
-      
+
       // Drop old table and rename new table to original name
       await db.execute('DROP TABLE transactions');
       await db.execute('ALTER TABLE transactions_new RENAME TO transactions');
@@ -126,12 +131,16 @@ class DatabaseHelper {
   }
 
   // --- Transaction Functions ---
-  Future<int> addTransaction(model.Transaction transaction, String userId) async {
+  Future<int> addTransaction(
+      model.Transaction transaction, String userId) async {
     final db = await database;
-    final newId = await db.insert('transactions', transaction.toMap()..['userId'] = userId);
+    final newId = await db.insert(
+        'transactions', transaction.toMap()..['userId'] = userId);
     // Firestore sync - don't block on this, use timeout to prevent hanging
     try {
-      final docData = transaction.toMap()..['id'] = newId..['userId'] = userId;
+      final docData = transaction.toMap()
+        ..['id'] = newId
+        ..['userId'] = userId;
       await _firestore
           .collection('users')
           .doc(userId)
@@ -149,14 +158,17 @@ class DatabaseHelper {
 
   Future<List<model.Transaction>> getTransactions(String userId) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('transactions', where: 'userId = ?', whereArgs: [userId], orderBy: 'date DESC');
-    return List.generate(maps.length, (i) => model.Transaction.fromMap(maps[i]));
+    final List<Map<String, dynamic>> maps = await db.query('transactions',
+        where: 'userId = ?', whereArgs: [userId], orderBy: 'date DESC');
+    return List.generate(
+        maps.length, (i) => model.Transaction.fromMap(maps[i]));
   }
 
   /// Updates a transaction in both local database and Firestore
   ///
   /// Modifies the transaction record locally and synchronizes changes to Firestore.
-  Future<int> updateTransaction(model.Transaction transaction, String userId) async {
+  Future<int> updateTransaction(
+      model.Transaction transaction, String userId) async {
     final db = await database;
     final result = await db.update(
       'transactions',
@@ -182,7 +194,8 @@ class DatabaseHelper {
 
   Future<int> deleteTransaction(int id, String userId) async {
     final db = await database;
-    final result = await db.delete('transactions', where: 'id = ? AND userId = ?', whereArgs: [id, userId]);
+    final result = await db.delete('transactions',
+        where: 'id = ? AND userId = ?', whereArgs: [id, userId]);
     try {
       await _firestore
           .collection('users')
@@ -202,19 +215,23 @@ class DatabaseHelper {
   // --- Category Functions ---
   Future<int> addCategory(app_category.Category category, String userId) async {
     final db = await database;
-    
+
     // Check if category with same name and type already exists
-    final existing = await getCategoryByName(category.name, userId, category.type);
+    final existing =
+        await getCategoryByName(category.name, userId, category.type);
     if (existing != null) {
-      throw Exception('A category with the name "${category.name}" already exists for ${category.type} transactions.');
+      throw Exception(
+          'A category with the name "${category.name}" already exists for ${category.type} transactions.');
     }
-    
+
     final map = category.toMap()..['userId'] = userId;
     final newId = await db.insert('categories', map);
-    
+
     if (newId > 0) {
-        try {
-        final docData = category.toMap()..['id'] = newId..['userId'] = userId;
+      try {
+        final docData = category.toMap()
+          ..['id'] = newId
+          ..['userId'] = userId;
         await _firestore
             .collection('users')
             .doc(userId)
@@ -224,19 +241,21 @@ class DatabaseHelper {
             .timeout(const Duration(seconds: 3), onTimeout: () {
           debugPrint('Firestore sync timeout for addCategory');
         });
-      } catch(e) {
+      } catch (e) {
         debugPrint('Firestore sync failed for addCategory: $e');
       }
     } else {
       throw Exception('Failed to add category - database returned ID: $newId');
     }
-    
+
     return newId;
   }
 
-  Future<int> updateCategory(app_category.Category category, String userId) async {
+  Future<int> updateCategory(
+      app_category.Category category, String userId) async {
     final db = await database;
-    final result = await db.update('categories', category.toMap(), where: 'id = ? AND userId = ?', whereArgs: [category.id, userId]);
+    final result = await db.update('categories', category.toMap(),
+        where: 'id = ? AND userId = ?', whereArgs: [category.id, userId]);
     try {
       await _firestore
           .collection('users')
@@ -253,20 +272,27 @@ class DatabaseHelper {
     return result;
   }
 
-  Future<List<app_category.Category>> getCategories(String userId, {String? type}) async {
+  Future<List<app_category.Category>> getCategories(String userId,
+      {String? type}) async {
     final db = await database;
     List<Map<String, dynamic>> maps;
     if (type != null) {
-      maps = await db.query('categories', where: 'userId = ? AND type = ?', whereArgs: [userId, type], orderBy: 'name');
+      maps = await db.query('categories',
+          where: 'userId = ? AND type = ?',
+          whereArgs: [userId, type],
+          orderBy: 'name');
     } else {
-      maps = await db.query('categories', where: 'userId = ?', whereArgs: [userId], orderBy: 'name');
+      maps = await db.query('categories',
+          where: 'userId = ?', whereArgs: [userId], orderBy: 'name');
     }
-    return List.generate(maps.length, (i) => app_category.Category.fromMap(maps[i]));
+    return List.generate(
+        maps.length, (i) => app_category.Category.fromMap(maps[i]));
   }
-  
+
   Future<int> deleteCategory(int id, String userId) async {
     final db = await database;
-    final result = await db.delete('categories', where: 'id = ? AND userId = ?', whereArgs: [id, userId]);
+    final result = await db.delete('categories',
+        where: 'id = ? AND userId = ?', whereArgs: [id, userId]);
     try {
       await _firestore
           .collection('users')
@@ -283,14 +309,18 @@ class DatabaseHelper {
     return result;
   }
 
-  Future<app_category.Category?> getCategoryByName(String name, String userId, String type) async {
+  Future<app_category.Category?> getCategoryByName(
+      String name, String userId, String type) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('categories', where: 'name = ? AND userId = ? AND type = ?', whereArgs: [name, userId, type]);
+    final List<Map<String, dynamic>> maps = await db.query('categories',
+        where: 'name = ? AND userId = ? AND type = ?',
+        whereArgs: [name, userId, type]);
     if (maps.isNotEmpty) return app_category.Category.fromMap(maps.first);
     return null;
   }
-  
-  Future<int> getOrCreateCategory(String name, String userId, {String type = 'expense'}) async {
+
+  Future<int> getOrCreateCategory(String name, String userId,
+      {String type = 'expense'}) async {
     final existingCategory = await getCategoryByName(name, userId, type);
     if (existingCategory != null && existingCategory.id != null) {
       return existingCategory.id!;
@@ -310,7 +340,9 @@ class DatabaseHelper {
     final db = await database;
     final newId = await db.insert('bills', bill.toMap()..['userId'] = userId);
     try {
-      final docData = bill.toMap()..['id'] = newId..['userId'] = userId;
+      final docData = bill.toMap()
+        ..['id'] = newId
+        ..['userId'] = userId;
       await _firestore
           .collection('users')
           .doc(userId)
@@ -328,15 +360,22 @@ class DatabaseHelper {
 
   Future<List<Bill>> getBills(String userId) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('bills', where: 'userId = ?', whereArgs: [userId], orderBy: 'dueDate ASC');
+    final List<Map<String, dynamic>> maps = await db.query('bills',
+        where: 'userId = ?', whereArgs: [userId], orderBy: 'dueDate ASC');
     return List.generate(maps.length, (i) => Bill.fromMap(maps[i]));
   }
-  
+
   Future<int> deleteBill(int id, String userId) async {
     final db = await database;
-    final result = await db.delete('bills', where: 'id = ? AND userId = ?', whereArgs: [id, userId]);
+    final result = await db.delete('bills',
+        where: 'id = ? AND userId = ?', whereArgs: [id, userId]);
     try {
-      await _firestore.collection('users').doc(userId).collection('bills').doc(id.toString()).delete();
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('bills')
+          .doc(id.toString())
+          .delete();
     } catch (e) {
       debugPrint('Firestore sync failed for deleteBill: $e');
     }
@@ -345,9 +384,15 @@ class DatabaseHelper {
 
   Future<int> updateBill(Bill bill, String userId) async {
     final db = await database;
-    final result = await db.update('bills', bill.toMap(), where: 'id = ? AND userId = ?', whereArgs: [bill.id, userId]);
+    final result = await db.update('bills', bill.toMap(),
+        where: 'id = ? AND userId = ?', whereArgs: [bill.id, userId]);
     try {
-      await _firestore.collection('users').doc(userId).collection('bills').doc(bill.id.toString()).update(bill.toMap());
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('bills')
+          .doc(bill.id.toString())
+          .update(bill.toMap());
     } catch (e) {
       debugPrint('Firestore sync failed for updateBill: $e');
     }
@@ -360,13 +405,15 @@ class DatabaseHelper {
     }
 
     final db = await database;
-    
+
     try {
       // Start a transaction for atomicity
       await db.transaction((txn) async {
         // Delete existing data
-        await txn.delete('transactions', where: 'userId = ?', whereArgs: [userId]);
-        await txn.delete('categories', where: 'userId = ?', whereArgs: [userId]);
+        await txn
+            .delete('transactions', where: 'userId = ?', whereArgs: [userId]);
+        await txn
+            .delete('categories', where: 'userId = ?', whereArgs: [userId]);
         await txn.delete('bills', where: 'userId = ?', whereArgs: [userId]);
 
         // Restore transactions
@@ -376,7 +423,7 @@ class DatabaseHelper {
               .doc(userId)
               .collection('transactions')
               .get();
-          
+
           for (final doc in transactionSnap.docs) {
             final data = doc.data();
             // Ensure userId is set and convert to proper format
@@ -389,13 +436,16 @@ class DatabaseHelper {
               'category_id': data['category_id'] ?? data['categoryId'],
               'userId': userId,
             };
-            await txn.insert('transactions', transactionData, conflictAlgorithm: ConflictAlgorithm.replace);
+            await txn.insert('transactions', transactionData,
+                conflictAlgorithm: ConflictAlgorithm.replace);
           }
           debugPrint('Restored ${transactionSnap.docs.length} transactions');
         } catch (e) {
           debugPrint('Error restoring transactions: $e');
-          if (e.toString().contains('permission') || e.toString().contains('PERMISSION_DENIED')) {
-            throw Exception('Permission denied: Please check your Firebase security rules. Make sure authenticated users can read their own data.');
+          if (e.toString().contains('permission') ||
+              e.toString().contains('PERMISSION_DENIED')) {
+            throw Exception(
+                'Permission denied: Please check your Firebase security rules. Make sure authenticated users can read their own data.');
           }
           rethrow;
         }
@@ -407,7 +457,7 @@ class DatabaseHelper {
               .doc(userId)
               .collection('categories')
               .get();
-          
+
           for (final doc in categorySnap.docs) {
             final data = doc.data();
             final categoryData = {
@@ -418,13 +468,16 @@ class DatabaseHelper {
               'colorValue': data['colorValue'] ?? data['color_value'],
               'userId': userId,
             };
-            await txn.insert('categories', categoryData, conflictAlgorithm: ConflictAlgorithm.replace);
+            await txn.insert('categories', categoryData,
+                conflictAlgorithm: ConflictAlgorithm.replace);
           }
           debugPrint('Restored ${categorySnap.docs.length} categories');
         } catch (e) {
           debugPrint('Error restoring categories: $e');
-          if (e.toString().contains('permission') || e.toString().contains('PERMISSION_DENIED')) {
-            throw Exception('Permission denied: Please check your Firebase security rules. Make sure authenticated users can read their own data.');
+          if (e.toString().contains('permission') ||
+              e.toString().contains('PERMISSION_DENIED')) {
+            throw Exception(
+                'Permission denied: Please check your Firebase security rules. Make sure authenticated users can read their own data.');
           }
           rethrow;
         }
@@ -436,7 +489,7 @@ class DatabaseHelper {
               .doc(userId)
               .collection('bills')
               .get();
-          
+
           for (final doc in billSnap.docs) {
             final data = doc.data();
             final billData = {
@@ -445,34 +498,42 @@ class DatabaseHelper {
               'amount': (data['amount'] ?? 0.0).toDouble(),
               'dueDate': data['dueDate'] ?? data['due_date'] ?? '',
               'isRecurring': data['isRecurring'] ?? data['is_recurring'] ?? 0,
-              'recurrenceType': data['recurrenceType'] ?? data['recurrence_type'],
-              'recurrenceValue': data['recurrenceValue'] ?? data['recurrence_value'],
+              'recurrenceType':
+                  data['recurrenceType'] ?? data['recurrence_type'],
+              'recurrenceValue':
+                  data['recurrenceValue'] ?? data['recurrence_value'],
               'userId': userId,
             };
-            await txn.insert('bills', billData, conflictAlgorithm: ConflictAlgorithm.replace);
+            await txn.insert('bills', billData,
+                conflictAlgorithm: ConflictAlgorithm.replace);
           }
           debugPrint('Restored ${billSnap.docs.length} bills');
         } catch (e) {
           debugPrint('Error restoring bills: $e');
-          if (e.toString().contains('permission') || e.toString().contains('PERMISSION_DENIED')) {
-            throw Exception('Permission denied: Please check your Firebase security rules. Make sure authenticated users can read their own data.');
+          if (e.toString().contains('permission') ||
+              e.toString().contains('PERMISSION_DENIED')) {
+            throw Exception(
+                'Permission denied: Please check your Firebase security rules. Make sure authenticated users can read their own data.');
           }
           rethrow;
         }
       });
-      
+
       debugPrint('--- Successfully restored data from Firestore ---');
     } catch (e) {
       debugPrint('--- Error restoring data from Firestore: $e ---');
       // Re-throw with a user-friendly message
-      if (e.toString().contains('permission') || e.toString().contains('PERMISSION_DENIED')) {
-        throw Exception('Permission denied: Please check your Firebase security rules. Make sure authenticated users can read their own data.');
-      } else if (e.toString().contains('network') || e.toString().contains('UNAVAILABLE')) {
-        throw Exception('Network error: Please check your internet connection and try again.');
+      if (e.toString().contains('permission') ||
+          e.toString().contains('PERMISSION_DENIED')) {
+        throw Exception(
+            'Permission denied: Please check your Firebase security rules. Make sure authenticated users can read their own data.');
+      } else if (e.toString().contains('network') ||
+          e.toString().contains('UNAVAILABLE')) {
+        throw Exception(
+            'Network error: Please check your internet connection and try again.');
       } else {
         throw Exception('Failed to restore data: ${e.toString()}');
       }
     }
   }
 }
-

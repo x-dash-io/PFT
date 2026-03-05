@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:personal_finance_tracker/theme/app_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'login_screen.dart';
@@ -13,7 +14,8 @@ class WelcomeScreen extends StatefulWidget {
   State<WelcomeScreen> createState() => _WelcomeScreenState();
 }
 
-class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateMixin {
+class _WelcomeScreenState extends State<WelcomeScreen>
+    with TickerProviderStateMixin {
   late final PageController _pageController;
   int _currentPage = 0;
   Timer? _carouselTimer;
@@ -27,26 +29,30 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
   final List<_WelcomeHighlight> _highlights = const [
     _WelcomeHighlight(
       title: 'Smart Insights',
-      description: 'Visual dashboards and analytics help you understand your spending patterns and make informed financial decisions.',
-      icon: Icons.insights_outlined,
+      description:
+          'Visual dashboards and analytics help you understand your spending patterns and make informed financial decisions.',
+      icon: AppIcons.insights_outlined,
       color: Color(0xFF4CAF50),
     ),
     _WelcomeHighlight(
       title: 'Secure & Private',
-      description: 'Your data is protected with biometric authentication, encrypted storage, and secure cloud sync. Privacy is our priority.',
-      icon: Icons.verified_user_outlined,
+      description:
+          'Your data is protected with biometric authentication, encrypted storage, and secure cloud sync. Privacy is our priority.',
+      icon: AppIcons.verified_user_outlined,
       color: Color(0xFF2196F3),
     ),
     _WelcomeHighlight(
       title: 'Bill Reminders',
-      description: 'Never miss a payment again. Set up recurring bills and get timely notifications to stay on top of your finances.',
-      icon: Icons.notifications_active_outlined,
+      description:
+          'Never miss a payment again. Set up recurring bills and get timely notifications to stay on top of your finances.',
+      icon: AppIcons.notifications_active_outlined,
       color: Color(0xFFFF9800),
     ),
     _WelcomeHighlight(
       title: 'Track Everything',
-      description: 'Categorize expenses, track income, manage budgets, and export detailed PDF reports for tax season.',
-      icon: Icons.analytics_outlined,
+      description:
+          'Categorize expenses, track income, manage budgets, and export detailed PDF reports for tax season.',
+      icon: AppIcons.analytics_outlined,
       color: Color(0xFF9C27B0),
     ),
   ];
@@ -59,12 +65,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
     'Custom categories',
     'Data backup',
   ];
-  
+
   @override
   void initState() {
     super.initState();
     _pageController = PageController(viewportFraction: 0.85);
-    
+
     // Initialize animation controllers
     _fadeController = AnimationController(
       duration: const Duration(milliseconds: 1200),
@@ -78,23 +84,24 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    
+
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _fadeController, curve: Curves.easeOut),
     );
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic));
+    ).animate(
+        CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic));
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(parent: _scaleController, curve: Curves.elasticOut),
     );
-    
+
     // Start animations
     _fadeController.forward();
     _slideController.forward();
     _scaleController.forward();
-    
+
     _startAutoSlide();
     _checkFirstLaunch();
   }
@@ -102,12 +109,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
   Future<void> _checkFirstLaunch() async {
     // Add a small delay to ensure the screen is fully built
     await Future.delayed(const Duration(milliseconds: 100));
-    
+
     if (!mounted) return;
-    
+
     final prefs = await SharedPreferences.getInstance();
     final hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
-    
+
     if (hasSeenWelcome && mounted) {
       Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => const LoginScreen()),
@@ -118,7 +125,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
   Future<void> _navigateToLogin() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('hasSeenWelcome', true);
-    
+
     if (mounted) {
       Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => const LoginScreen()),
@@ -152,7 +159,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
         statusBarBrightness: Brightness.light,
       ),
     );
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -271,7 +278,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Icon(
-              Icons.account_balance_wallet_rounded,
+              AppIcons.account_balance_wallet_rounded,
               color: Colors.white,
               size: 40,
             ),
@@ -300,11 +307,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
           const SizedBox(height: 24),
           Row(
             children: [
-              _buildStatBadge(Icons.trending_up, 'Smart', Colors.white.withOpacity(0.2)),
+              _buildStatBadge(
+                  AppIcons.trending_up, 'Smart', Colors.white.withOpacity(0.2)),
               const SizedBox(width: 12),
-              _buildStatBadge(Icons.security, 'Secure', Colors.white.withOpacity(0.2)),
+              _buildStatBadge(
+                  AppIcons.security, 'Secure', Colors.white.withOpacity(0.2)),
               const SizedBox(width: 12),
-              _buildStatBadge(Icons.sync, 'Synced', Colors.white.withOpacity(0.2)),
+              _buildStatBadge(
+                  AppIcons.sync, 'Synced', Colors.white.withOpacity(0.2)),
             ],
           ),
         ],
@@ -377,7 +387,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
                     child: Opacity(
                       opacity: value,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
@@ -425,19 +436,19 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
   IconData _getIconForFeature(String feature) {
     switch (feature.toLowerCase()) {
       case 'cloud sync':
-        return Icons.cloud_done;
+        return AppIcons.cloud_done;
       case 'offline mode':
-        return Icons.offline_bolt;
+        return AppIcons.offline_bolt;
       case 'pdf reports':
-        return Icons.picture_as_pdf;
+        return AppIcons.picture_as_pdf;
       case 'bill alerts':
-        return Icons.notifications;
+        return AppIcons.notifications;
       case 'custom categories':
-        return Icons.category;
+        return AppIcons.category;
       case 'data backup':
-        return Icons.backup;
+        return AppIcons.backup;
       default:
-        return Icons.check_circle;
+        return AppIcons.check_circle;
     }
   }
 
@@ -483,8 +494,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
                 margin: EdgeInsets.only(
                   right: index == _highlights.length - 1 ? 0 : 16,
                 ),
-                transform: Matrix4.identity()
-                  ..scale(isActive ? 1.0 : 0.95),
+                transform: Matrix4.identity()..scale(isActive ? 1.0 : 0.95),
                 child: Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
@@ -499,7 +509,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
                     ),
                     borderRadius: BorderRadius.circular(28),
                     border: Border.all(
-                      color: isActive 
+                      color: isActive
                           ? card.color.withOpacity(0.3)
                           : Colors.grey[200]!,
                       width: isActive ? 2 : 1,
@@ -590,9 +600,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
                   height: 8,
                   width: isActive ? 40 : 8,
                   decoration: BoxDecoration(
-                    color: isActive
-                        ? _highlights[index].color
-                        : Colors.grey[300],
+                    color:
+                        isActive ? _highlights[index].color : Colors.grey[300],
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: isActive
                         ? [
@@ -631,11 +640,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildStatItem('100%', 'Free', Icons.favorite),
+          _buildStatItem('100%', 'Free', AppIcons.favorite),
           Container(width: 1, height: 40, color: Colors.grey[300]),
-          _buildStatItem('24/7', 'Support', Icons.support_agent),
+          _buildStatItem('24/7', 'Support', AppIcons.support_agent),
           Container(width: 1, height: 40, color: Colors.grey[300]),
-          _buildStatItem('∞', 'Unlimited', Icons.all_inclusive),
+          _buildStatItem('∞', 'Unlimited', AppIcons.all_inclusive),
         ],
       ),
     );
@@ -691,4 +700,3 @@ class _WelcomeHighlight {
     required this.color,
   });
 }
-

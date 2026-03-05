@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
+import 'package:personal_finance_tracker/theme/app_icons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,8 +12,6 @@ import '../helpers/config.dart';
 import '../helpers/database_helper.dart';
 import '../helpers/dialog_helper.dart';
 import '../helpers/cache_helper.dart';
-import '../theme/app_theme.dart';
-import 'passcode_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -33,7 +32,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isRestoring = false;
   bool _isClearingCache = false;
   String _selectedCurrency = 'KSh';
-  bool _isPasscodeEnabled = false;
   bool _isImageLoading = false;
   String? _cachedImageUrl;
   String _cacheSize = 'Calculating...';
@@ -192,8 +190,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final request = http.MultipartRequest('POST', url);
       request.files.add(await http.MultipartFile.fromPath('file', image.path));
 
-      final timestamp = (DateTime.now().millisecondsSinceEpoch ~/ 1000)
-          .toString();
+      final timestamp =
+          (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString();
       final stringToSign =
           'timestamp=$timestamp${AppConfig.cloudinaryApiSecret}';
       final signature = sha1.convert(utf8.encode(stringToSign)).toString();
@@ -275,7 +273,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (mounted) {
       setState(() {
         _selectedCurrency = prefs.getString('currency') ?? 'KSh';
-        _isPasscodeEnabled = prefs.getString('passcode') != null;
       });
     }
   }
@@ -611,7 +608,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: const Icon(
-                                Icons.edit,
+                                AppIcons.edit,
                                 size: 18,
                                 color: Color(0xFF4CAF50),
                               ),
@@ -642,76 +639,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       _buildModernCard(
                         children: [
                           _buildSettingTile(
-                            icon: Icons.lock_outline,
-                            title: 'Passcode Lock',
-                            trailing: Switch(
-                              value: _isPasscodeEnabled,
-                              activeColor: const Color(0xFF4CAF50),
-                              onChanged: (value) async {
-                                final prefs =
-                                    await SharedPreferences.getInstance();
-                                if (value) {
-                                  final success = await Navigator.of(context)
-                                      .push<bool>(
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const PasscodeScreen(
-                                                isSettingPasscode: true,
-                                              ),
-                                        ),
-                                      );
-                                  if (success == true) {
-                                    setState(() => _isPasscodeEnabled = true);
-                                  }
-                                } else {
-                                  final success = await Navigator.of(context)
-                                      .push<bool>(
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const PasscodeScreen(
-                                                isSettingPasscode: false,
-                                              ),
-                                        ),
-                                      );
-                                  if (success == true) {
-                                    await prefs.remove('passcode');
-                                    setState(() => _isPasscodeEnabled = false);
-                                  }
-                                }
-                              },
-                            ),
-                          ),
-                          if (_isPasscodeEnabled) ...[
-                            const Divider(height: 1),
-                            _buildSettingTile(
-                              icon: Icons.phonelink_lock,
-                              title: 'Change Passcode',
-                              onTap: () async {
-                                final verified = await Navigator.of(context)
-                                    .push<bool>(
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const PasscodeScreen(
-                                              isSettingPasscode: false,
-                                            ),
-                                      ),
-                                    );
-                                if (verified == true) {
-                                  await Navigator.of(context).push<bool>(
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const PasscodeScreen(
-                                            isSettingPasscode: true,
-                                          ),
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                          ],
-                          const Divider(height: 1),
-                          _buildSettingTile(
-                            icon: Icons.money,
+                            icon: AppIcons.money,
                             title: 'Currency',
                             trailing: Container(
                               padding: const EdgeInsets.symmetric(
@@ -729,15 +657,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     .map<DropdownMenuItem<String>>(
                                       (String value) =>
                                           DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(
-                                              value,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                                color: Color(0xFF4CAF50),
-                                              ),
-                                            ),
+                                        value: value,
+                                        child: Text(
+                                          value,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF4CAF50),
                                           ),
+                                        ),
+                                      ),
                                     )
                                     .toList(),
                                 onChanged: (String? newValue) {
@@ -762,13 +690,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       _buildModernCard(
                         children: [
                           _buildSettingTile(
-                            icon: Icons.password,
+                            icon: AppIcons.password,
                             title: 'Change Password',
                             onTap: _sendPasswordResetEmail,
                           ),
                           const Divider(height: 1),
                           _buildSettingTile(
-                            icon: Icons.delete_forever,
+                            icon: AppIcons.delete_forever,
                             title: 'Delete Account',
                             titleColor: Colors.red,
                             iconColor: Colors.red,
@@ -784,7 +712,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       _buildModernCard(
                         children: [
                           _buildSettingTile(
-                            icon: Icons.cloud_download_outlined,
+                            icon: AppIcons.cloud_download_outlined,
                             title: 'Restore from Cloud',
                             subtitle: 'Download your backup on a new device',
                             trailing: _isRestoring
@@ -797,14 +725,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   )
                                 : const Icon(
-                                    Icons.chevron_right,
+                                    AppIcons.chevron_right,
                                     color: Colors.grey,
                                   ),
                             onTap: _isRestoring ? null : _handleRestore,
                           ),
                           const Divider(height: 1),
                           _buildSettingTile(
-                            icon: Icons.cleaning_services_outlined,
+                            icon: AppIcons.cleaning_services_outlined,
                             title: 'Clear Cache',
                             subtitle: 'Cache size: $_cacheSize',
                             trailing: _isClearingCache
@@ -817,7 +745,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   )
                                 : const Icon(
-                                    Icons.chevron_right,
+                                    AppIcons.chevron_right,
                                     color: Colors.grey,
                                   ),
                             onTap: _isClearingCache ? null : _handleClearCache,
@@ -832,13 +760,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       _buildModernCard(
                         children: [
                           _buildSettingTile(
-                            icon: Icons.question_answer_outlined,
+                            icon: AppIcons.question_answer_outlined,
                             title: 'FAQ',
                             onTap: _showFaqDialog,
                           ),
                           const Divider(height: 1),
                           _buildSettingTile(
-                            icon: Icons.support_agent,
+                            icon: AppIcons.support_agent,
                             title: 'Contact via WhatsApp',
                             onTap: _launchWhatsApp,
                           ),
@@ -861,7 +789,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     color: Colors.white,
                                   ),
                                 )
-                              : const Icon(Icons.logout),
+                              : const Icon(AppIcons.logout),
                           label: Text(
                             _isLoggingOut ? 'Logging out...' : 'Logout',
                           ),
@@ -919,7 +847,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return CircleAvatar(
         radius: 50,
         backgroundColor: const Color(0xFF4CAF50).withOpacity(0.1),
-        child: const Icon(Icons.person, size: 50, color: Color(0xFF4CAF50)),
+        child: const Icon(AppIcons.person, size: 50, color: Color(0xFF4CAF50)),
       );
     }
 
@@ -986,7 +914,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
-                    Icons.person,
+                    AppIcons.person,
                     size: 50,
                     color: Color(0xFF4CAF50),
                   ),
@@ -997,7 +925,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   radius: 50,
                   backgroundColor: const Color(0xFF4CAF50).withOpacity(0.1),
                   child: const Icon(
-                    Icons.person,
+                    AppIcons.person,
                     size: 50,
                     color: Color(0xFF4CAF50),
                   ),
@@ -1049,10 +977,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             )
           : null,
-      trailing:
-          trailing ??
+      trailing: trailing ??
           (onTap != null
-              ? const Icon(Icons.chevron_right, color: Colors.grey)
+              ? const Icon(AppIcons.chevron_right, color: Colors.grey)
               : null),
       onTap: onTap,
     );

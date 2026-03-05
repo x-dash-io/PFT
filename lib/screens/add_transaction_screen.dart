@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:personal_finance_tracker/theme/app_icons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import '../helpers/database_helper.dart';
@@ -45,8 +46,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     });
 
     try {
-      final categories =
-          await dbHelper.getCategories(_currentUser!.uid, type: _transactionType);
+      final categories = await dbHelper.getCategories(_currentUser!.uid,
+          type: _transactionType);
 
       if (!mounted) return;
 
@@ -65,7 +66,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
         if (!hasExistingSelection) {
           // Reset to first category or null if list is empty
-          _selectedCategoryId = _categories.isNotEmpty ? _categories.first.id : null;
+          _selectedCategoryId =
+              _categories.isNotEmpty ? _categories.first.id : null;
         }
       });
     } catch (e) {
@@ -111,15 +113,16 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         categoryId: _selectedCategoryId,
       );
 
-      final transactionId = await dbHelper.addTransaction(newTransaction, _currentUser!.uid);
+      final transactionId =
+          await dbHelper.addTransaction(newTransaction, _currentUser!.uid);
 
       if (!mounted) return;
-      
+
       // Reset state first
       setState(() {
         _isSaving = false;
       });
-      
+
       // Show success and navigate - return true to indicate success
       SnackbarHelper.showSuccess(context, 'Transaction saved successfully!');
       // Small delay to ensure database write is complete
@@ -159,7 +162,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: const Icon(AppIcons.arrow_back, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
@@ -191,7 +194,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       child: _buildTypeButton(
                         'expense',
                         'Expense',
-                        Icons.arrow_upward,
+                        AppIcons.arrow_upward,
                         Colors.red,
                       ),
                     ),
@@ -200,7 +203,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       child: _buildTypeButton(
                         'income',
                         'Income',
-                        Icons.arrow_downward,
+                        AppIcons.arrow_downward,
                         const Color(0xFF4CAF50),
                       ),
                     ),
@@ -208,13 +211,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-              
+
               // Amount Field
               _buildSectionTitle('Amount'),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _amountController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
                 style: const TextStyle(
                   color: Colors.black87,
                   fontSize: 18,
@@ -233,7 +237,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(
-                      Icons.attach_money,
+                      AppIcons.attach_money,
                       color: Color(0xFF4CAF50),
                       size: 24,
                     ),
@@ -272,7 +276,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 },
               ),
               const SizedBox(height: 32),
-              
+
               // Category Field
               _buildSectionTitle('Category'),
               const SizedBox(height: 12),
@@ -287,7 +291,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       border: Border.all(color: Colors.grey[300]!),
                     ),
                     child: IconButton(
-                      icon: const Icon(Icons.add, color: Color(0xFF4CAF50)),
+                      icon: const Icon(AppIcons.add, color: Color(0xFF4CAF50)),
                       onPressed: _isSaving ? null : _handleAddCategory,
                       tooltip: 'Add Category',
                       iconSize: 28,
@@ -296,7 +300,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ],
               ),
               const SizedBox(height: 32),
-              
+
               // Description Field
               _buildSectionTitle('Description (Optional)'),
               const SizedBox(height: 12),
@@ -328,7 +332,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-              
+
               // Date Field
               _buildSectionTitle('Date'),
               const SizedBox(height: 12),
@@ -343,9 +347,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                     ),
                     child: TextFormField(
                       controller: TextEditingController(
-                        text: DateFormat('EEEE, MMMM d, y').format(_selectedDate),
+                        text:
+                            DateFormat('EEEE, MMMM d, y').format(_selectedDate),
                       ),
-                      style: const TextStyle(color: Colors.black87, fontSize: 16),
+                      style:
+                          const TextStyle(color: Colors.black87, fontSize: 16),
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.transparent,
@@ -360,7 +366,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Icon(
-                            Icons.calendar_today,
+                            AppIcons.calendar_today,
                             color: Color(0xFF4CAF50),
                             size: 20,
                           ),
@@ -375,7 +381,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ),
               ),
               const SizedBox(height: 40),
-              
+
               // Save Button
               SizedBox(
                 width: double.infinity,
@@ -429,7 +435,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     );
   }
 
-  Widget _buildTypeButton(String type, String label, IconData icon, Color color) {
+  Widget _buildTypeButton(
+      String type, String label, IconData icon, Color color) {
     final isSelected = _transactionType == type;
     return GestureDetector(
       onTap: () {
@@ -511,7 +518,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
-                _transactionType == 'expense' ? Icons.category : Icons.source,
+                _transactionType == 'expense'
+                    ? AppIcons.category
+                    : AppIcons.source,
                 color: const Color(0xFF4CAF50),
               ),
             ),
@@ -530,8 +539,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     }
 
     // Ensure selected value exists in the categories list
-    final validSelectedId = _selectedCategoryId != null && 
-        _categories.any((cat) => cat.id == _selectedCategoryId)
+    final validSelectedId = _selectedCategoryId != null &&
+            _categories.any((cat) => cat.id == _selectedCategoryId)
         ? _selectedCategoryId
         : null;
 
@@ -562,7 +571,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
-              _transactionType == 'expense' ? Icons.category : Icons.source,
+              _transactionType == 'expense'
+                  ? AppIcons.category
+                  : AppIcons.source,
               color: const Color(0xFF4CAF50),
               size: 20,
             ),
@@ -578,12 +589,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           style: TextStyle(color: Colors.grey[500]),
         ),
         items: _categories.map((category) {
-          IconData icon = Icons.label;
+          IconData icon = AppIcons.label;
           if (category.iconCodePoint != null) {
-            icon = IconData(
-              category.iconCodePoint!,
-              fontFamily: 'MaterialIcons',
-            );
+            icon = AppIcons.fromCodePoint(category.iconCodePoint!);
           }
           return DropdownMenuItem<int>(
             value: category.id,
@@ -609,8 +617,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             _selectedCategoryId = newValue;
           });
         },
-        validator: (value) =>
-            value == null ? 'Please select a category' : null,
+        validator: (value) => value == null ? 'Please select a category' : null,
       ),
     );
   }

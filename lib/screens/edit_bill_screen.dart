@@ -1,6 +1,7 @@
 // lib/screens/edit_bill_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:personal_finance_tracker/theme/app_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../helpers/database_helper.dart';
@@ -25,7 +26,7 @@ class _EditBillScreenState extends State<EditBillScreen> {
   late TextEditingController _amountController;
   late DateTime _selectedDate;
   final User? _currentUser = FirebaseAuth.instance.currentUser;
-  
+
   // State variables for recurring bills
   late bool _isRecurring;
   late String _recurrenceType;
@@ -36,7 +37,8 @@ class _EditBillScreenState extends State<EditBillScreen> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.bill.name);
-    _amountController = TextEditingController(text: widget.bill.amount.toString());
+    _amountController =
+        TextEditingController(text: widget.bill.amount.toString());
     _selectedDate = widget.bill.dueDate;
     _isRecurring = widget.bill.isRecurring;
     _recurrenceType = widget.bill.recurrenceType ?? 'monthly';
@@ -66,8 +68,9 @@ class _EditBillScreenState extends State<EditBillScreen> {
 
       // Check for duplicate bill names (excluding current bill)
       final existingBills = await dbHelper.getBills(_currentUser.uid);
-      final isDuplicate = existingBills.any(
-          (bill) => bill.id != widget.bill.id && bill.name.toLowerCase() == billName.toLowerCase());
+      final isDuplicate = existingBills.any((bill) =>
+          bill.id != widget.bill.id &&
+          bill.name.toLowerCase() == billName.toLowerCase());
 
       if (isDuplicate) {
         if (mounted) {
@@ -104,12 +107,12 @@ class _EditBillScreenState extends State<EditBillScreen> {
       await notificationService.scheduleBillNotification(updatedBill);
 
       if (!mounted) return;
-      
+
       // Reset state first
       setState(() {
         _isSaving = false;
       });
-      
+
       // Show success and navigate
       SnackbarHelper.showSuccess(context, 'Bill updated successfully!');
       Navigator.of(context).pop(true);
@@ -131,7 +134,8 @@ class _EditBillScreenState extends State<EditBillScreen> {
     final bool? confirm = await DialogHelper.showConfirmDialog(
       context: context,
       title: 'Delete Bill',
-      message: 'Are you sure you want to delete "${widget.bill.name}"? This action cannot be undone.',
+      message:
+          'Are you sure you want to delete "${widget.bill.name}"? This action cannot be undone.',
       confirmText: 'Delete',
       confirmColor: Colors.red,
     );
@@ -143,22 +147,22 @@ class _EditBillScreenState extends State<EditBillScreen> {
 
       try {
         final dbHelper = DatabaseHelper();
-        
+
         // Cancel notification
         final notificationService = NotificationService();
         if (widget.bill.id != null) {
           await notificationService.cancelNotification(widget.bill.id!);
         }
-        
+
         await dbHelper.deleteBill(widget.bill.id!, _currentUser.uid);
-        
+
         if (!mounted) return;
-        
+
         // Reset state first
         setState(() {
           _isDeleting = false;
         });
-        
+
         // Show success and navigate
         SnackbarHelper.showSuccess(context, 'Bill deleted successfully!');
         Navigator.of(context).pop(true);
@@ -196,7 +200,7 @@ class _EditBillScreenState extends State<EditBillScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: const Icon(AppIcons.arrow_back, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
@@ -223,7 +227,7 @@ class _EditBillScreenState extends State<EditBillScreen> {
             )
           else
             IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.red),
+              icon: const Icon(AppIcons.delete_outline, color: Colors.red),
               onPressed: _isSaving ? null : _deleteBill,
               tooltip: 'Delete Bill',
             ),
@@ -266,17 +270,19 @@ class _EditBillScreenState extends State<EditBillScreen> {
                     vertical: 16,
                   ),
                 ),
-                validator: (value) =>
-                    value == null || value.isEmpty ? 'Please enter a name' : null,
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Please enter a name'
+                    : null,
               ),
               const SizedBox(height: 32),
-              
+
               // Amount Field
               _buildSectionTitle('Amount'),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _amountController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
                 style: const TextStyle(
                   color: Colors.black87,
                   fontSize: 18,
@@ -295,7 +301,7 @@ class _EditBillScreenState extends State<EditBillScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(
-                      Icons.attach_money,
+                      AppIcons.attach_money,
                       color: Color(0xFF4CAF50),
                       size: 24,
                     ),
@@ -334,7 +340,7 @@ class _EditBillScreenState extends State<EditBillScreen> {
                 },
               ),
               const SizedBox(height: 32),
-              
+
               // Due Date Field
               _buildSectionTitle('Due Date'),
               const SizedBox(height: 12),
@@ -349,9 +355,11 @@ class _EditBillScreenState extends State<EditBillScreen> {
                     ),
                     child: TextFormField(
                       controller: TextEditingController(
-                        text: DateFormat('EEEE, MMMM d, y').format(_selectedDate),
+                        text:
+                            DateFormat('EEEE, MMMM d, y').format(_selectedDate),
                       ),
-                      style: const TextStyle(color: Colors.black87, fontSize: 16),
+                      style:
+                          const TextStyle(color: Colors.black87, fontSize: 16),
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.transparent,
@@ -366,7 +374,7 @@ class _EditBillScreenState extends State<EditBillScreen> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Icon(
-                            Icons.calendar_today,
+                            AppIcons.calendar_today,
                             color: Color(0xFF4CAF50),
                             size: 20,
                           ),
@@ -399,7 +407,7 @@ class _EditBillScreenState extends State<EditBillScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
-                        Icons.repeat,
+                        AppIcons.repeat,
                         color: Color(0xFF4CAF50),
                         size: 24,
                       ),
@@ -445,7 +453,7 @@ class _EditBillScreenState extends State<EditBillScreen> {
                   ],
                 ),
               ),
-              
+
               // Frequency selector (only if recurring)
               if (_isRecurring) ...[
                 const SizedBox(height: 24),
@@ -493,7 +501,7 @@ class _EditBillScreenState extends State<EditBillScreen> {
               ],
 
               const SizedBox(height: 40),
-              
+
               // Update Button
               SizedBox(
                 width: double.infinity,
@@ -547,4 +555,3 @@ class _EditBillScreenState extends State<EditBillScreen> {
     );
   }
 }
-

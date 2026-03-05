@@ -4,6 +4,7 @@
 /// with consistent styling and behavior across the application.
 
 import 'package:flutter/material.dart';
+import 'package:personal_finance_tracker/theme/app_icons.dart';
 
 class DialogHelper {
   // Modern dialog with rounded corners and better styling
@@ -190,7 +191,7 @@ class SnackbarHelper {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.check_circle, color: Colors.white),
+            const Icon(AppIcons.check_circle, color: Colors.white),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -219,7 +220,7 @@ class SnackbarHelper {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.error, color: Colors.white),
+            const Icon(AppIcons.error, color: Colors.white),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -248,7 +249,7 @@ class SnackbarHelper {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.info, color: Colors.white),
+            const Icon(AppIcons.info, color: Colors.white),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -272,4 +273,3 @@ class SnackbarHelper {
     );
   }
 }
-
