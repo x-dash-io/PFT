@@ -186,20 +186,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
     return expenseData;
   }
 
-  Map<String, double> _prepareBarChartData(
-      List<model.Transaction> transactions) {
-    double totalIncome = 0;
-    double totalExpenses = 0;
-    for (var t in transactions) {
-      if (t.type == 'income') {
-        totalIncome += t.amount;
-      } else {
-        totalExpenses += t.amount;
-      }
-    }
-    return {'Income': totalIncome, 'Expenses': totalExpenses};
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -235,7 +221,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 _filterTransactionsByPeriod(transactions, _selectedTimeFilter);
             final summary =
                 _buildSummaryStats(transactions, _selectedTimeFilter);
-            final barChartData = _prepareBarChartData(periodTransactions);
             final expenseData =
                 _prepareExpenseData(periodTransactions, categoryMap);
             final cashFlowSeries =
@@ -274,7 +259,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       const SizedBox(height: 20),
                       _buildCashFlowCard(cashFlowSeries),
                       const SizedBox(height: 20),
-                      _buildIncomeExpenseBarChart(barChartData),
+                      _buildIncomeExpenseTrendChart(cashFlowSeries),
                       const SizedBox(height: 20),
                       _buildExpenseBreakdown(expenseData, categoryMap),
                     ],
@@ -359,28 +344,34 @@ class _ReportsScreenState extends State<ReportsScreen> {
         String tip,
         Color color
       }) summary) {
-    return GridView.count(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      crossAxisCount: 2,
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      childAspectRatio: 1.3,
-      children: [
-        _StatTile(
-          label: 'Total Income',
-          value: '$_currencySymbol ${currencyFormatter.format(summary.income)}',
-          icon: AppIcons.arrow_downward_rounded,
-          iconColor: const Color(0xFF1B5E20),
-        ),
-        _StatTile(
-          label: 'Total Expenses',
-          value:
-              '$_currencySymbol ${currencyFormatter.format(summary.expenses)}',
-          icon: AppIcons.arrow_upward_rounded,
-          iconColor: const Color(0xFFC62828),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isNarrow = constraints.maxWidth < 420;
+        return GridView.count(
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          crossAxisCount: isNarrow ? 1 : 2,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: isNarrow ? 2.8 : 1.3,
+          children: [
+            _StatTile(
+              label: 'Total Income',
+              value:
+                  '$_currencySymbol ${currencyFormatter.format(summary.income)}',
+              icon: AppIcons.arrow_downward_rounded,
+              iconColor: const Color(0xFF1B5E20),
+            ),
+            _StatTile(
+              label: 'Total Expenses',
+              value:
+                  '$_currencySymbol ${currencyFormatter.format(summary.expenses)}',
+              icon: AppIcons.arrow_upward_rounded,
+              iconColor: const Color(0xFFC62828),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -701,37 +692,23 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                 LineChartBarData(
                                   spots: incomeSpots,
                                   isCurved: true,
-                                  color: const Color(0xFF4CAF50),
+                                  color: AppColors.primary,
                                   barWidth: 4,
                                   isStrokeCapRound: true,
-                                  dotData: FlDotData(
-                                    show: true,
-                                    getDotPainter:
-                                        (spot, percent, barData, index) {
-                                      return FlDotCirclePainter(
-                                        radius: 8,
-                                        color: const Color(0xFF4CAF50),
-                                        strokeWidth: 4,
-                                        strokeColor: Colors.white,
-                                      );
-                                    },
-                                  ),
+                                  dotData: const FlDotData(show: false),
                                   belowBarData: BarAreaData(
                                     show: true,
                                     gradient: LinearGradient(
                                       begin: Alignment.topCenter,
                                       end: Alignment.bottomCenter,
                                       colors: [
-                                        const Color(0xFF4CAF50)
-                                            .withOpacity(0.2),
-                                        const Color(0xFF4CAF50)
-                                            .withOpacity(0.05),
+                                        AppColors.primary.withOpacity(0.2),
+                                        AppColors.primary.withOpacity(0.05),
                                       ],
                                     ),
                                   ),
                                   shadow: Shadow(
-                                    color: const Color(0xFF4CAF50)
-                                        .withOpacity(0.2),
+                                    color: AppColors.primary.withOpacity(0.2),
                                     blurRadius: 6,
                                     offset: const Offset(0, 3),
                                   ),
@@ -743,18 +720,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                   color: const Color(0xFFE53935),
                                   barWidth: 4,
                                   isStrokeCapRound: true,
-                                  dotData: FlDotData(
-                                    show: true,
-                                    getDotPainter:
-                                        (spot, percent, barData, index) {
-                                      return FlDotCirclePainter(
-                                        radius: 8,
-                                        color: const Color(0xFFE53935),
-                                        strokeWidth: 4,
-                                        strokeColor: Colors.white,
-                                      );
-                                    },
-                                  ),
+                                  dotData: const FlDotData(show: false),
                                   belowBarData: BarAreaData(
                                     show: true,
                                     gradient: LinearGradient(
@@ -810,17 +776,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                         strokeWidth: 2,
                                         dashArray: [4, 4],
                                       ),
-                                      FlDotData(
-                                        getDotPainter:
-                                            (spot, percent, barData, index) {
-                                          return FlDotCirclePainter(
-                                            radius: 8,
-                                            color: Colors.white,
-                                            strokeWidth: 4,
-                                            strokeColor: barData.color!,
-                                          );
-                                        },
-                                      ),
+                                      const FlDotData(show: false),
                                     );
                                   }).toList();
                                 },
@@ -852,18 +808,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
                             width: 16,
                             height: 4,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF4CAF50),
+                              color: AppColors.primary,
                               borderRadius: BorderRadius.circular(2),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF4CAF50),
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -894,16 +840,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE53935),
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
                           Text(
                             'Expenses',
                             style: TextStyle(
@@ -926,7 +862,39 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
   }
 
-  Widget _buildIncomeExpenseBarChart(Map<String, double> barChartData) {
+  Widget _buildIncomeExpenseTrendChart(List<_CashFlowPoint> series) {
+    if (series.isEmpty) {
+      return Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: SizedBox(
+          height: 200,
+          child: Center(
+            child: Text(
+              'Not enough data to show trend.',
+              style: TextStyle(color: Colors.grey[600]),
+            ),
+          ),
+        ),
+      );
+    }
+
+    final maxY = series
+        .map((point) =>
+            point.income > point.expense ? point.income : point.expense)
+        .fold<double>(0, (prev, value) => value > prev ? value : prev);
+    final effectiveMaxY =
+        (maxY <= 0 ? 1000.0 : math.max(maxY * 1.2, maxY + 100)).toDouble();
+    final yInterval = (effectiveMaxY / 4).clamp(100.0, double.infinity);
+
+    final incomeSpots = [
+      for (int i = 0; i < series.length; i++)
+        FlSpot(i.toDouble(), series[i].income),
+    ];
+    final expenseSpots = [
+      for (int i = 0; i < series.length; i++)
+        FlSpot(i.toDouble(), series[i].expense),
+    ];
+
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 0,
@@ -943,7 +911,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
             children: [
               Row(
                 children: [
-                  Icon(LucideIcons.barChart3,
+                  Icon(LucideIcons.lineChart,
                       size: 24, color: AppColors.primary),
                   const SizedBox(width: 12),
                   Expanded(
@@ -951,7 +919,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Income vs Expenses',
+                          'Income vs Expenses Trend',
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.w700),
                         ),
@@ -969,46 +937,56 @@ class _ReportsScreenState extends State<ReportsScreen> {
               const SizedBox(height: 20),
               SizedBox(
                 height: 280,
-                child: BarChart(
-                  BarChartData(
-                    alignment: BarChartAlignment.spaceAround,
-                    maxY: _getBarChartMaxY(barChartData),
+                child: LineChart(
+                  LineChartData(
                     minY: 0,
-                    barGroups: [
-                      _buildBarGroupData(0, barChartData['Income'] ?? 0,
-                          AppColors.success, _getBarChartMaxY(barChartData)),
-                      _buildBarGroupData(1, barChartData['Expenses'] ?? 0,
-                          AppColors.error, _getBarChartMaxY(barChartData)),
-                    ],
+                    maxY: effectiveMaxY,
+                    clipData: FlClipData.none(),
                     titlesData: FlTitlesData(
                       bottomTitles: AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: true,
-                          getTitlesWidget: (value, meta) => Padding(
-                            padding: const EdgeInsets.only(top: 12.0),
-                            child: Text(
-                              value.toInt() == 0 ? 'Income' : 'Expenses',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 14,
-                                  color: AppColors.neutralDark),
-                            ),
-                          ),
+                          reservedSize: 42,
+                          interval: series.length > 8
+                              ? (series.length / 8).ceil().toDouble()
+                              : 1,
+                          getTitlesWidget: (value, meta) {
+                            final index = value.toInt();
+                            if (index < 0 || index >= series.length) {
+                              return const SizedBox();
+                            }
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: Text(
+                                series[index].label,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[700],
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            );
+                          },
                         ),
                       ),
                       leftTitles: AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: true,
-                          reservedSize: 60,
-                          interval: (_getBarChartMaxY(barChartData) / 4)
-                              .clamp(1, double.infinity),
-                          getTitlesWidget: (value, meta) => Text(
-                            compactFormatter.format(value),
-                            style: TextStyle(
-                                color: AppColors.neutralMedium,
+                          reservedSize: 58,
+                          interval: yInterval,
+                          getTitlesWidget: (value, meta) {
+                            if (value == 0) return const SizedBox();
+                            return Text(
+                              compactFormatter.format(value),
+                              style: TextStyle(
+                                color: Colors.grey[700],
                                 fontWeight: FontWeight.w600,
-                                fontSize: 12),
-                          ),
+                                fontSize: 11,
+                              ),
+                            );
+                          },
                         ),
                       ),
                       topTitles: const AxisTitles(
@@ -1019,6 +997,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     gridData: FlGridData(
                       show: true,
                       drawVerticalLine: false,
+                      horizontalInterval: yInterval,
                       getDrawingHorizontalLine: (value) => FlLine(
                           color: AppColors.neutralBorder, strokeWidth: 1),
                     ),
@@ -1031,6 +1010,66 @@ class _ReportsScreenState extends State<ReportsScreen> {
                             color: AppColors.neutralBorder, width: 1.5),
                         top: BorderSide.none,
                         right: BorderSide.none,
+                      ),
+                    ),
+                    lineBarsData: [
+                      LineChartBarData(
+                        spots: incomeSpots,
+                        isCurved: true,
+                        barWidth: 3.5,
+                        color: AppColors.success,
+                        isStrokeCapRound: true,
+                        dotData: const FlDotData(show: false),
+                        belowBarData: BarAreaData(
+                          show: true,
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              AppColors.success.withOpacity(0.18),
+                              AppColors.success.withOpacity(0.03),
+                            ],
+                          ),
+                        ),
+                      ),
+                      LineChartBarData(
+                        spots: expenseSpots,
+                        isCurved: true,
+                        barWidth: 3.5,
+                        color: AppColors.error,
+                        isStrokeCapRound: true,
+                        dotData: const FlDotData(show: false),
+                        belowBarData: BarAreaData(
+                          show: true,
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              AppColors.error.withOpacity(0.15),
+                              AppColors.error.withOpacity(0.03),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                    lineTouchData: LineTouchData(
+                      enabled: true,
+                      touchTooltipData: LineTouchTooltipData(
+                        getTooltipColor: (touchedSpot) => Colors.grey[900]!,
+                        tooltipRoundedRadius: 8,
+                        getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+                          return touchedBarSpots.map((barSpot) {
+                            final isIncome = barSpot.barIndex == 0;
+                            return LineTooltipItem(
+                              '${isIncome ? "Income" : "Expenses"}\n$_currencySymbol ${compactFormatter.format(barSpot.y)}',
+                              const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 12,
+                              ),
+                            );
+                          }).toList();
+                        },
                       ),
                     ),
                   ),
@@ -1220,16 +1259,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
   }
 
-  double _getBarChartMaxY(Map<String, double> barChartData) {
-    final maxValue = ([
-      barChartData['Income'] ?? 0,
-      barChartData['Expenses'] ?? 0,
-    ]..sort())
-        .last;
-    if (maxValue == 0) return 1000;
-    return (maxValue * 1.2).clamp(1000, double.infinity);
-  }
-
   Widget _buildLegendItem(String label, Color color) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -1291,82 +1320,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildDetailedLegendItem(
-      String label, String subtitle, Color color, IconData icon) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          width: 16,
-          height: 16,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(4),
-            boxShadow: [
-              BoxShadow(
-                color: color.withOpacity(0.4),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Icon(icon, size: 10, color: Colors.white),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                  letterSpacing: 0.2,
-                ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[700],
-                  fontWeight: FontWeight.w600,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  BarChartGroupData _buildBarGroupData(
-      int x, double y, Color color, double maxY) {
-    return BarChartGroupData(
-      x: x,
-      barRods: [
-        BarChartRodData(
-          toY: y,
-          color: color,
-          width: 60,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(12),
-            topRight: Radius.circular(12),
-          ),
-          backDrawRodData: BackgroundBarChartRodData(
-            show: true,
-            toY: maxY,
-            color: Colors.grey.shade100,
-          ),
-        ),
-      ],
     );
   }
 

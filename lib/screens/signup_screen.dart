@@ -156,7 +156,7 @@ class _SignUpScreenState extends State<SignUpScreen>
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -186,14 +186,14 @@ class _SignUpScreenState extends State<SignUpScreen>
                         height: 70,
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)],
+                            colors: [AppColors.primary, AppColors.secondary],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(18),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF4CAF50).withOpacity(0.3),
+                              color: AppColors.primary.withOpacity(0.3),
                               blurRadius: 12,
                               offset: const Offset(0, 6),
                             ),
@@ -273,12 +273,12 @@ class _SignUpScreenState extends State<SignUpScreen>
                             margin: const EdgeInsets.all(12),
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF4CAF50).withOpacity(0.1),
+                              color: AppColors.primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(
                               AppIcons.person_outline,
-                              color: Color(0xFF4CAF50),
+                              color: AppColors.primary,
                               size: 20,
                             ),
                           ),
@@ -293,7 +293,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
                             borderSide: const BorderSide(
-                              color: Color(0xFF4CAF50),
+                              color: AppColors.primary,
                               width: 2,
                             ),
                           ),
@@ -343,12 +343,12 @@ class _SignUpScreenState extends State<SignUpScreen>
                             margin: const EdgeInsets.all(12),
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF4CAF50).withOpacity(0.1),
+                              color: AppColors.primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(
                               AppIcons.email_outlined,
-                              color: Color(0xFF4CAF50),
+                              color: AppColors.primary,
                               size: 20,
                             ),
                           ),
@@ -363,7 +363,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
                             borderSide: const BorderSide(
-                              color: Color(0xFF4CAF50),
+                              color: AppColors.primary,
                               width: 2,
                             ),
                           ),
@@ -416,12 +416,12 @@ class _SignUpScreenState extends State<SignUpScreen>
                             margin: const EdgeInsets.all(12),
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF4CAF50).withOpacity(0.1),
+                              color: AppColors.primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(
                               AppIcons.lock_outline,
-                              color: Color(0xFF4CAF50),
+                              color: AppColors.primary,
                               size: 20,
                             ),
                           ),
@@ -436,7 +436,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
                             borderSide: const BorderSide(
-                              color: Color(0xFF4CAF50),
+                              color: AppColors.primary,
                               width: 2,
                             ),
                           ),
@@ -502,12 +502,12 @@ class _SignUpScreenState extends State<SignUpScreen>
                             margin: const EdgeInsets.all(12),
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF4CAF50).withOpacity(0.1),
+                              color: AppColors.primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(
                               AppIcons.lock_outline,
-                              color: Color(0xFF4CAF50),
+                              color: AppColors.primary,
                               size: 20,
                             ),
                           ),
@@ -522,7 +522,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
                             borderSide: const BorderSide(
-                              color: Color(0xFF4CAF50),
+                              color: AppColors.primary,
                               width: 2,
                             ),
                           ),
@@ -578,7 +578,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                               _agreeToTerms = value ?? false;
                             });
                           },
-                          activeColor: const Color(0xFF4CAF50),
+                          activeColor: AppColors.primary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(6),
                           ),
@@ -619,13 +619,13 @@ class _SignUpScreenState extends State<SignUpScreen>
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _signUp,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4CAF50),
+                          backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
                           elevation: 4,
-                          shadowColor: const Color(0xFF4CAF50).withOpacity(0.4),
+                          shadowColor: AppColors.primary.withOpacity(0.4),
                           disabledBackgroundColor: Colors.grey[300],
                         ),
                         child: _isLoading
@@ -679,7 +679,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF4CAF50),
+                            color: AppColors.primary,
                           ),
                         ),
                       ),

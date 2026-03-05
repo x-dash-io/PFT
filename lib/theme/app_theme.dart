@@ -94,89 +94,89 @@ class AppTheme {
       // Scaffold
       scaffoldBackgroundColor: AppColors.neutralBackground,
 
-      // Text Theme with Poppins Font
-      textTheme: GoogleFonts.poppinsTextTheme().copyWith(
+      // Text Theme with Manrope Font
+      textTheme: GoogleFonts.manropeTextTheme().copyWith(
         // Display Styles
-        displayLarge: GoogleFonts.poppins(
+        displayLarge: GoogleFonts.manrope(
           fontSize: 32,
           fontWeight: FontWeight.w700,
           color: AppColors.neutralDark,
           letterSpacing: -0.5,
         ),
-        displayMedium: GoogleFonts.poppins(
+        displayMedium: GoogleFonts.manrope(
           fontSize: 28,
           fontWeight: FontWeight.w700,
           color: AppColors.neutralDark,
         ),
-        displaySmall: GoogleFonts.poppins(
+        displaySmall: GoogleFonts.manrope(
           fontSize: 24,
           fontWeight: FontWeight.w700,
           color: AppColors.neutralDark,
         ),
 
         // Headline Styles
-        headlineLarge: GoogleFonts.poppins(
+        headlineLarge: GoogleFonts.manrope(
           fontSize: 28,
           fontWeight: FontWeight.w700,
           color: AppColors.neutralDark,
         ),
-        headlineMedium: GoogleFonts.poppins(
+        headlineMedium: GoogleFonts.manrope(
           fontSize: 24,
           fontWeight: FontWeight.w600,
           color: AppColors.neutralDark,
         ),
-        headlineSmall: GoogleFonts.poppins(
+        headlineSmall: GoogleFonts.manrope(
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: AppColors.neutralDark,
         ),
 
         // Title Styles
-        titleLarge: GoogleFonts.poppins(
+        titleLarge: GoogleFonts.manrope(
           fontSize: 18,
           fontWeight: FontWeight.w700,
           color: AppColors.neutralDark,
         ),
-        titleMedium: GoogleFonts.poppins(
+        titleMedium: GoogleFonts.manrope(
           fontSize: 16,
           fontWeight: FontWeight.w600,
           color: AppColors.neutralDark,
         ),
-        titleSmall: GoogleFonts.poppins(
+        titleSmall: GoogleFonts.manrope(
           fontSize: 14,
           fontWeight: FontWeight.w600,
           color: AppColors.neutralDark,
         ),
 
         // Body Styles
-        bodyLarge: GoogleFonts.poppins(
+        bodyLarge: GoogleFonts.manrope(
           fontSize: 16,
           fontWeight: FontWeight.w500,
           color: AppColors.neutralDark,
         ),
-        bodyMedium: GoogleFonts.poppins(
+        bodyMedium: GoogleFonts.manrope(
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: AppColors.neutralDark,
         ),
-        bodySmall: GoogleFonts.poppins(
+        bodySmall: GoogleFonts.manrope(
           fontSize: 12,
           fontWeight: FontWeight.w500,
           color: AppColors.neutralLight,
         ),
 
         // Label Styles
-        labelLarge: GoogleFonts.poppins(
+        labelLarge: GoogleFonts.manrope(
           fontSize: 14,
           fontWeight: FontWeight.w600,
           color: AppColors.neutralDark,
         ),
-        labelMedium: GoogleFonts.poppins(
+        labelMedium: GoogleFonts.manrope(
           fontSize: 12,
           fontWeight: FontWeight.w600,
           color: AppColors.neutralMedium,
         ),
-        labelSmall: GoogleFonts.poppins(
+        labelSmall: GoogleFonts.manrope(
           fontSize: 11,
           fontWeight: FontWeight.w600,
           color: AppColors.neutralLight,
@@ -192,7 +192,7 @@ class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle: GoogleFonts.poppins(
+          textStyle: GoogleFonts.manrope(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.5,
@@ -204,7 +204,7 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primary,
-          textStyle: GoogleFonts.poppins(
+          textStyle: GoogleFonts.manrope(
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -219,7 +219,7 @@ class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle: GoogleFonts.poppins(
+          textStyle: GoogleFonts.manrope(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -258,12 +258,12 @@ class AppTheme {
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        hintStyle: GoogleFonts.poppins(
+        hintStyle: GoogleFonts.manrope(
           color: AppColors.neutralLight,
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
-        labelStyle: GoogleFonts.poppins(
+        labelStyle: GoogleFonts.manrope(
           color: AppColors.neutralMedium,
           fontSize: 14,
           fontWeight: FontWeight.w500,
@@ -275,7 +275,7 @@ class AppTheme {
         backgroundColor: AppColors.white,
         elevation: 0,
         centerTitle: false,
-        titleTextStyle: GoogleFonts.poppins(
+        titleTextStyle: GoogleFonts.manrope(
           fontSize: 20,
           fontWeight: FontWeight.w700,
           color: AppColors.neutralDark,
@@ -289,7 +289,7 @@ class AppTheme {
         elevation: 0,
         indicatorColor: AppColors.primary.withOpacity(0.1),
         labelTextStyle: WidgetStateProperty.all(
-          GoogleFonts.poppins(
+          GoogleFonts.manrope(
             fontSize: 12,
             fontWeight: FontWeight.w600,
             color: AppColors.neutralMedium,
@@ -334,89 +334,89 @@ class AppTheme {
       // Scaffold
       scaffoldBackgroundColor: AppColors.darkNeutralBackground,
 
-      // Text Theme with Poppins Font - Dark Mode
-      textTheme: GoogleFonts.poppinsTextTheme().copyWith(
+      // Text Theme with Manrope Font - Dark Mode
+      textTheme: GoogleFonts.manropeTextTheme().copyWith(
         // Display Styles
-        displayLarge: GoogleFonts.poppins(
+        displayLarge: GoogleFonts.manrope(
           fontSize: 32,
           fontWeight: FontWeight.w700,
           color: AppColors.darkText,
           letterSpacing: -0.5,
         ),
-        displayMedium: GoogleFonts.poppins(
+        displayMedium: GoogleFonts.manrope(
           fontSize: 28,
           fontWeight: FontWeight.w700,
           color: AppColors.darkText,
         ),
-        displaySmall: GoogleFonts.poppins(
+        displaySmall: GoogleFonts.manrope(
           fontSize: 24,
           fontWeight: FontWeight.w700,
           color: AppColors.darkText,
         ),
 
         // Headline Styles
-        headlineLarge: GoogleFonts.poppins(
+        headlineLarge: GoogleFonts.manrope(
           fontSize: 28,
           fontWeight: FontWeight.w700,
           color: AppColors.darkText,
         ),
-        headlineMedium: GoogleFonts.poppins(
+        headlineMedium: GoogleFonts.manrope(
           fontSize: 24,
           fontWeight: FontWeight.w600,
           color: AppColors.darkText,
         ),
-        headlineSmall: GoogleFonts.poppins(
+        headlineSmall: GoogleFonts.manrope(
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: AppColors.darkText,
         ),
 
         // Title Styles
-        titleLarge: GoogleFonts.poppins(
+        titleLarge: GoogleFonts.manrope(
           fontSize: 18,
           fontWeight: FontWeight.w700,
           color: AppColors.darkText,
         ),
-        titleMedium: GoogleFonts.poppins(
+        titleMedium: GoogleFonts.manrope(
           fontSize: 16,
           fontWeight: FontWeight.w600,
           color: AppColors.darkText,
         ),
-        titleSmall: GoogleFonts.poppins(
+        titleSmall: GoogleFonts.manrope(
           fontSize: 14,
           fontWeight: FontWeight.w600,
           color: AppColors.darkText,
         ),
 
         // Body Styles
-        bodyLarge: GoogleFonts.poppins(
+        bodyLarge: GoogleFonts.manrope(
           fontSize: 16,
           fontWeight: FontWeight.w500,
           color: AppColors.darkText,
         ),
-        bodyMedium: GoogleFonts.poppins(
+        bodyMedium: GoogleFonts.manrope(
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: AppColors.darkText,
         ),
-        bodySmall: GoogleFonts.poppins(
+        bodySmall: GoogleFonts.manrope(
           fontSize: 12,
           fontWeight: FontWeight.w500,
           color: AppColors.darkNeutralMedium,
         ),
 
         // Label Styles
-        labelLarge: GoogleFonts.poppins(
+        labelLarge: GoogleFonts.manrope(
           fontSize: 14,
           fontWeight: FontWeight.w600,
           color: AppColors.darkText,
         ),
-        labelMedium: GoogleFonts.poppins(
+        labelMedium: GoogleFonts.manrope(
           fontSize: 12,
           fontWeight: FontWeight.w600,
           color: AppColors.darkNeutralMedium,
         ),
-        labelSmall: GoogleFonts.poppins(
+        labelSmall: GoogleFonts.manrope(
           fontSize: 11,
           fontWeight: FontWeight.w600,
           color: AppColors.darkNeutralLight,
@@ -432,7 +432,7 @@ class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle: GoogleFonts.poppins(
+          textStyle: GoogleFonts.manrope(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.5,
@@ -444,7 +444,7 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.darkPrimary,
-          textStyle: GoogleFonts.poppins(
+          textStyle: GoogleFonts.manrope(
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -459,7 +459,7 @@ class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle: GoogleFonts.poppins(
+          textStyle: GoogleFonts.manrope(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -498,12 +498,12 @@ class AppTheme {
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        hintStyle: GoogleFonts.poppins(
+        hintStyle: GoogleFonts.manrope(
           color: AppColors.darkNeutralMedium,
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
-        labelStyle: GoogleFonts.poppins(
+        labelStyle: GoogleFonts.manrope(
           color: AppColors.darkNeutralLight,
           fontSize: 14,
           fontWeight: FontWeight.w500,
@@ -515,7 +515,7 @@ class AppTheme {
         backgroundColor: AppColors.darkCardBackground,
         elevation: 0,
         centerTitle: false,
-        titleTextStyle: GoogleFonts.poppins(
+        titleTextStyle: GoogleFonts.manrope(
           fontSize: 20,
           fontWeight: FontWeight.w700,
           color: AppColors.darkText,
@@ -529,7 +529,7 @@ class AppTheme {
         elevation: 0,
         indicatorColor: AppColors.darkPrimary.withOpacity(0.1),
         labelTextStyle: WidgetStateProperty.all(
-          GoogleFonts.poppins(
+          GoogleFonts.manrope(
             fontSize: 12,
             fontWeight: FontWeight.w600,
             color: AppColors.darkNeutralMedium,

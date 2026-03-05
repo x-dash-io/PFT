@@ -4,6 +4,7 @@
 /// with modern Material Design styling.
 
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
 class DatePickerHelper {
   static Future<DateTime?> showModernDatePicker({
@@ -21,13 +22,13 @@ class DatePickerHelper {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Color(0xFF4CAF50),
+              primary: AppColors.primary,
               onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Colors.black87,
+              surface: AppColors.neutralBackground,
+              onSurface: AppColors.neutralDark,
             ),
             dialogTheme: const DialogThemeData(
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.neutralBackground,
             ),
           ),
           child: child!,
@@ -51,13 +52,13 @@ class DatePickerHelper {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Color(0xFF4CAF50),
+              primary: AppColors.primary,
               onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Colors.black87,
+              surface: AppColors.neutralBackground,
+              onSurface: AppColors.neutralDark,
             ),
             dialogTheme: const DialogThemeData(
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.neutralBackground,
             ),
           ),
           child: child!,

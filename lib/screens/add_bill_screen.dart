@@ -128,9 +128,9 @@ class _AddBillScreenState extends State<AddBillScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(AppIcons.arrow_back, color: Colors.black87),
@@ -174,7 +174,7 @@ class _AddBillScreenState extends State<AddBillScreen> {
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: const BorderSide(
-                      color: Color(0xFF4CAF50),
+                      color: AppColors.primary,
                       width: 2,
                     ),
                   ),
@@ -210,12 +210,12 @@ class _AddBillScreenState extends State<AddBillScreen> {
                     margin: const EdgeInsets.all(12),
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF4CAF50).withOpacity(0.1),
+                      color: AppColors.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(
                       AppIcons.attach_money,
-                      color: Color(0xFF4CAF50),
+                      color: AppColors.primary,
                       size: 24,
                     ),
                   ),
@@ -230,7 +230,7 @@ class _AddBillScreenState extends State<AddBillScreen> {
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: const BorderSide(
-                      color: Color(0xFF4CAF50),
+                      color: AppColors.primary,
                       width: 2,
                     ),
                   ),
@@ -283,12 +283,12 @@ class _AddBillScreenState extends State<AddBillScreen> {
                           margin: const EdgeInsets.all(12),
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF4CAF50).withOpacity(0.1),
+                            color: AppColors.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Icon(
                             AppIcons.calendar_today,
-                            color: Color(0xFF4CAF50),
+                            color: AppColors.primary,
                             size: 20,
                           ),
                         ),
@@ -316,12 +316,12 @@ class _AddBillScreenState extends State<AddBillScreen> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF4CAF50).withOpacity(0.1),
+                        color: AppColors.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
                         AppIcons.repeat,
-                        color: Color(0xFF4CAF50),
+                        color: AppColors.primary,
                         size: 24,
                       ),
                     ),
@@ -361,7 +361,7 @@ class _AddBillScreenState extends State<AddBillScreen> {
                           _isRecurring = value;
                         });
                       },
-                      activeColor: const Color(0xFF4CAF50),
+                      activeColor: AppColors.primary,
                     ),
                   ],
                 ),
@@ -422,7 +422,7 @@ class _AddBillScreenState extends State<AddBillScreen> {
                 child: ElevatedButton(
                   onPressed: _isSaving ? null : _saveBill,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4CAF50),
+                    backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     disabledBackgroundColor: Colors.grey[300],
                     shape: RoundedRectangleBorder(

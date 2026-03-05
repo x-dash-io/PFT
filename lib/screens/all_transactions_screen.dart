@@ -271,7 +271,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                             final transaction = _filteredTransactions[index];
                             final isIncome = transaction.type == 'income';
                             final amountColor =
-                                isIncome ? const Color(0xFF4CAF50) : Colors.red;
+                                isIncome ? AppColors.primary : Colors.red;
                             final amountPrefix = isIncome ? '+' : '-';
 
                             return Card(
@@ -319,7 +319,10 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                                 trailing: ConstrainedBox(
                                   constraints: BoxConstraints(
                                     maxWidth:
-                                        MediaQuery.of(context).size.width * 0.3,
+                                        (MediaQuery.sizeOf(context).width *
+                                                0.38)
+                                            .clamp(110.0, 160.0)
+                                            .toDouble(),
                                   ),
                                   child: Text(
                                     '$amountPrefix${currencyFormatter.format(transaction.amount)}',

@@ -5,6 +5,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:personal_finance_tracker/theme/app_icons.dart';
+import '../theme/app_theme.dart';
 
 class DialogHelper {
   // Modern dialog with rounded corners and better styling
@@ -19,6 +20,7 @@ class DialogHelper {
       context: context,
       barrierDismissible: barrierDismissible,
       builder: (context) => Dialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
@@ -33,7 +35,7 @@ class DialogHelper {
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: AppColors.neutralDark,
                 ),
               ),
               const SizedBox(height: 20),
@@ -68,7 +70,7 @@ class DialogHelper {
         message,
         style: TextStyle(
           fontSize: 16,
-          color: Colors.grey[700],
+          color: AppColors.neutralMedium,
           height: 1.5,
         ),
       ),
@@ -78,7 +80,7 @@ class DialogHelper {
           child: Text(
             cancelText,
             style: TextStyle(
-              color: Colors.grey[600],
+              color: AppColors.neutralMedium,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -87,7 +89,7 @@ class DialogHelper {
         ElevatedButton(
           onPressed: () => Navigator.of(context).pop(true),
           style: ElevatedButton.styleFrom(
-            backgroundColor: confirmColor ?? const Color(0xFF4CAF50),
+            backgroundColor: confirmColor ?? AppColors.primary,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             shape: RoundedRectangleBorder(
@@ -122,24 +124,24 @@ class DialogHelper {
         controller: controller,
         autofocus: true,
         keyboardType: keyboardType,
-        style: const TextStyle(color: Colors.black87, fontSize: 16),
+        style: const TextStyle(color: AppColors.neutralDark, fontSize: 16),
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: TextStyle(color: Colors.grey[400]),
+          hintStyle: const TextStyle(color: AppColors.neutralLight),
           filled: true,
-          fillColor: Colors.grey[50],
+          fillColor: AppColors.neutralBackground,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.grey[300]!),
+            borderSide: const BorderSide(color: AppColors.neutralBorder),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.grey[300]!),
+            borderSide: const BorderSide(color: AppColors.neutralBorder),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(
-              color: Color(0xFF4CAF50),
+              color: AppColors.primary,
               width: 2,
             ),
           ),
@@ -155,7 +157,7 @@ class DialogHelper {
           child: Text(
             cancelText,
             style: TextStyle(
-              color: Colors.grey[600],
+              color: AppColors.neutralMedium,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -168,7 +170,7 @@ class DialogHelper {
             }
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF4CAF50),
+            backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             shape: RoundedRectangleBorder(
@@ -204,7 +206,7 @@ class SnackbarHelper {
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF4CAF50),
+        backgroundColor: AppColors.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),

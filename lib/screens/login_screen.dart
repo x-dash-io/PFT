@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../helpers/dialog_helper.dart';
 import '../auth_gate.dart';
 import 'signup_screen.dart';
+import '../theme/app_theme.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -196,9 +197,9 @@ class _LoginScreenState extends State<LoginScreen>
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(AppIcons.arrow_back_rounded, color: Colors.black87),
@@ -225,14 +226,14 @@ class _LoginScreenState extends State<LoginScreen>
                         height: 100,
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)],
+                            colors: [AppColors.primary, AppColors.secondary],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF4CAF50).withOpacity(0.3),
+                              color: AppColors.primary.withOpacity(0.3),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),
@@ -312,12 +313,12 @@ class _LoginScreenState extends State<LoginScreen>
                             margin: const EdgeInsets.all(12),
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF4CAF50).withOpacity(0.1),
+                              color: AppColors.primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(
                               AppIcons.email_outlined,
-                              color: Color(0xFF4CAF50),
+                              color: AppColors.primary,
                               size: 20,
                             ),
                           ),
@@ -332,7 +333,7 @@ class _LoginScreenState extends State<LoginScreen>
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
                             borderSide: const BorderSide(
-                              color: Color(0xFF4CAF50),
+                              color: AppColors.primary,
                               width: 2,
                             ),
                           ),
@@ -391,12 +392,12 @@ class _LoginScreenState extends State<LoginScreen>
                             margin: const EdgeInsets.all(12),
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF4CAF50).withOpacity(0.1),
+                              color: AppColors.primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(
                               AppIcons.lock_outline,
-                              color: Color(0xFF4CAF50),
+                              color: AppColors.primary,
                               size: 20,
                             ),
                           ),
@@ -411,7 +412,7 @@ class _LoginScreenState extends State<LoginScreen>
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
                             borderSide: const BorderSide(
-                              color: Color(0xFF4CAF50),
+                              color: AppColors.primary,
                               width: 2,
                             ),
                           ),
@@ -461,13 +462,13 @@ class _LoginScreenState extends State<LoginScreen>
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _login,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4CAF50),
+                          backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
                           elevation: 4,
-                          shadowColor: const Color(0xFF4CAF50).withOpacity(0.4),
+                          shadowColor: AppColors.primary.withOpacity(0.4),
                           disabledBackgroundColor: Colors.grey[300],
                         ),
                         child: _isLoading
@@ -528,7 +529,7 @@ class _LoginScreenState extends State<LoginScreen>
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF4CAF50),
+                            color: AppColors.primary,
                           ),
                         ),
                       ),

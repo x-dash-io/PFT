@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:personal_finance_tracker/theme/app_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'auth_gate.dart';
@@ -108,14 +107,14 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(child: _widgetOptions.elementAt(_selectedIndex)),
+      body: _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onItemTapped,
-        backgroundColor: AppColors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         height: 72,
         elevation: 0,
-        indicatorColor: AppColors.primary.withOpacity(0.1),
+        indicatorColor: AppColors.primary.withOpacity(0.14),
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         destinations: const <NavigationDestination>[
           NavigationDestination(

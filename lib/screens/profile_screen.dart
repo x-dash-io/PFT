@@ -12,6 +12,7 @@ import '../helpers/config.dart';
 import '../helpers/database_helper.dart';
 import '../helpers/dialog_helper.dart';
 import '../helpers/cache_helper.dart';
+import '../theme/app_theme.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -385,7 +386,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _launchWhatsApp() async {
-    const phoneNumber = '+254713561800'; // WhatsApp format: no spaces
+    const phoneNumber = '+254748088741'; // WhatsApp format: no spaces
     const message = 'Hello, I have a question about the Ledgerlite app.';
     final whatsappUrl = Uri.parse(
       "https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message)}",
@@ -450,7 +451,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ElevatedButton(
           onPressed: () => Navigator.of(context).pop(),
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF4CAF50),
+            backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             shape: RoundedRectangleBorder(
@@ -524,9 +525,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         // If user is null (logged out), show loading as AuthGate will handle navigation
         if (user == null) {
-          return const Scaffold(
-            backgroundColor: Colors.white,
-            body: Center(child: CircularProgressIndicator()),
+          return Scaffold(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            body: const Center(child: CircularProgressIndicator()),
           );
         }
 
@@ -540,7 +541,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
 
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           body: SafeArea(
             child: Column(
               children: [
@@ -553,8 +554,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        const Color(0xFF4CAF50).withOpacity(0.1),
-                        const Color(0xFF4CAF50).withOpacity(0.05),
+                        AppColors.primary.withOpacity(0.1),
+                        AppColors.primary.withOpacity(0.05),
                       ],
                     ),
                   ),
@@ -604,13 +605,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: Container(
                               padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF4CAF50).withOpacity(0.1),
+                                color: AppColors.primary.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: const Icon(
                                 AppIcons.edit,
                                 size: 18,
-                                color: Color(0xFF4CAF50),
+                                color: AppColors.primary,
                               ),
                             ),
                           ),
@@ -647,7 +648,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF4CAF50).withOpacity(0.1),
+                                color: AppColors.primary.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: DropdownButton<String>(
@@ -662,7 +663,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           value,
                                           style: const TextStyle(
                                             fontWeight: FontWeight.w600,
-                                            color: Color(0xFF4CAF50),
+                                            color: AppColors.primary,
                                           ),
                                         ),
                                       ),
@@ -721,7 +722,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     height: 20,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2.5,
-                                      color: Color(0xFF4CAF50),
+                                      color: AppColors.primary,
                                     ),
                                   )
                                 : const Icon(
@@ -846,8 +847,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (user.photoURL == null || user.photoURL!.isEmpty) {
       return CircleAvatar(
         radius: 50,
-        backgroundColor: const Color(0xFF4CAF50).withOpacity(0.1),
-        child: const Icon(AppIcons.person, size: 50, color: Color(0xFF4CAF50)),
+        backgroundColor: AppColors.primary.withOpacity(0.1),
+        child: const Icon(AppIcons.person, size: 50, color: AppColors.primary),
       );
     }
 
@@ -886,7 +887,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: CircularProgressIndicator(
               strokeWidth: 4,
               valueColor: AlwaysStoppedAnimation<Color>(
-                const Color(0xFF4CAF50),
+                AppColors.primary,
               ),
               backgroundColor: Colors.grey.shade200,
             ),
@@ -894,7 +895,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         // Avatar with image
         CircleAvatar(
           radius: 50,
-          backgroundColor: const Color(0xFF4CAF50).withOpacity(0.1),
+          backgroundColor: AppColors.primary.withOpacity(0.1),
           child: ClipOval(
             child: Image.network(
               imageUrl,
@@ -910,24 +911,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF4CAF50).withOpacity(0.1),
+                    color: AppColors.primary.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     AppIcons.person,
                     size: 50,
-                    color: Color(0xFF4CAF50),
+                    color: AppColors.primary,
                   ),
                 );
               },
               errorBuilder: (context, error, stackTrace) {
                 return CircleAvatar(
                   radius: 50,
-                  backgroundColor: const Color(0xFF4CAF50).withOpacity(0.1),
+                  backgroundColor: AppColors.primary.withOpacity(0.1),
                   child: const Icon(
                     AppIcons.person,
                     size: 50,
-                    color: Color(0xFF4CAF50),
+                    color: AppColors.primary,
                   ),
                 );
               },
@@ -954,12 +955,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: (iconColor ?? const Color(0xFF4CAF50)).withOpacity(0.1),
+          color: (iconColor ?? AppColors.primary).withOpacity(0.1),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(
           icon,
-          color: iconColor ?? const Color(0xFF4CAF50),
+          color: iconColor ?? AppColors.primary,
           size: 24,
         ),
       ),

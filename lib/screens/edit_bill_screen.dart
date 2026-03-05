@@ -195,9 +195,9 @@ class _EditBillScreenState extends State<EditBillScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(AppIcons.arrow_back, color: Colors.black87),
@@ -261,7 +261,7 @@ class _EditBillScreenState extends State<EditBillScreen> {
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: const BorderSide(
-                      color: Color(0xFF4CAF50),
+                      color: AppColors.primary,
                       width: 2,
                     ),
                   ),
@@ -297,12 +297,12 @@ class _EditBillScreenState extends State<EditBillScreen> {
                     margin: const EdgeInsets.all(12),
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF4CAF50).withOpacity(0.1),
+                      color: AppColors.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(
                       AppIcons.attach_money,
-                      color: Color(0xFF4CAF50),
+                      color: AppColors.primary,
                       size: 24,
                     ),
                   ),
@@ -317,7 +317,7 @@ class _EditBillScreenState extends State<EditBillScreen> {
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: const BorderSide(
-                      color: Color(0xFF4CAF50),
+                      color: AppColors.primary,
                       width: 2,
                     ),
                   ),
@@ -370,12 +370,12 @@ class _EditBillScreenState extends State<EditBillScreen> {
                           margin: const EdgeInsets.all(12),
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF4CAF50).withOpacity(0.1),
+                            color: AppColors.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Icon(
                             AppIcons.calendar_today,
-                            color: Color(0xFF4CAF50),
+                            color: AppColors.primary,
                             size: 20,
                           ),
                         ),
@@ -403,12 +403,12 @@ class _EditBillScreenState extends State<EditBillScreen> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF4CAF50).withOpacity(0.1),
+                        color: AppColors.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
                         AppIcons.repeat,
-                        color: Color(0xFF4CAF50),
+                        color: AppColors.primary,
                         size: 24,
                       ),
                     ),
@@ -448,7 +448,7 @@ class _EditBillScreenState extends State<EditBillScreen> {
                           _isRecurring = value;
                         });
                       },
-                      activeColor: const Color(0xFF4CAF50),
+                      activeColor: AppColors.primary,
                     ),
                   ],
                 ),
@@ -509,7 +509,7 @@ class _EditBillScreenState extends State<EditBillScreen> {
                 child: ElevatedButton(
                   onPressed: (_isSaving || _isDeleting) ? null : _updateBill,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4CAF50),
+                    backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     disabledBackgroundColor: Colors.grey[300],
                     shape: RoundedRectangleBorder(

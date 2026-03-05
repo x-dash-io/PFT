@@ -32,7 +32,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       description:
           'Visual dashboards and analytics help you understand your spending patterns and make informed financial decisions.',
       icon: AppIcons.insights_outlined,
-      color: Color(0xFF4CAF50),
+      color: AppColors.primary,
     ),
     _WelcomeHighlight(
       title: 'Secure & Private',
@@ -161,7 +161,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -207,14 +207,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       child: ElevatedButton(
                         onPressed: _navigateToLogin,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4CAF50),
+                          backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 18),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
                           elevation: 4,
-                          shadowColor: const Color(0xFF4CAF50).withOpacity(0.4),
+                          shadowColor: AppColors.primary.withOpacity(0.4),
                         ),
                         child: const Text(
                           'Get Started',
@@ -234,7 +234,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF4CAF50),
+                          color: AppColors.primary,
                         ),
                       ),
                     ),
@@ -254,14 +254,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF4CAF50), Color(0xFF66BB6A), Color(0xFF81C784)],
+          colors: [AppColors.primary, AppColors.secondary, AppColors.tertiary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4CAF50).withOpacity(0.3),
+            color: AppColors.primary.withOpacity(0.3),
             blurRadius: 30,
             offset: const Offset(0, 15),
             spreadRadius: 0,
@@ -305,14 +305,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             ),
           ),
           const SizedBox(height: 24),
-          Row(
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
             children: [
               _buildStatBadge(
                   AppIcons.trending_up, 'Smart', Colors.white.withOpacity(0.2)),
-              const SizedBox(width: 12),
               _buildStatBadge(
                   AppIcons.security, 'Secure', Colors.white.withOpacity(0.2)),
-              const SizedBox(width: 12),
               _buildStatBadge(
                   AppIcons.sync, 'Synced', Colors.white.withOpacity(0.2)),
             ],
@@ -392,13 +392,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              const Color(0xFF4CAF50).withOpacity(0.1),
-                              const Color(0xFF4CAF50).withOpacity(0.05),
+                              AppColors.primary.withOpacity(0.1),
+                              AppColors.primary.withOpacity(0.05),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: const Color(0xFF4CAF50).withOpacity(0.2),
+                            color: AppColors.primary.withOpacity(0.2),
                             width: 1.5,
                           ),
                         ),
@@ -408,7 +408,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             Icon(
                               _getIconForFeature(text),
                               size: 16,
-                              color: const Color(0xFF4CAF50),
+                              color: AppColors.primary,
                             ),
                             const SizedBox(width: 8),
                             Text(
@@ -637,13 +637,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: Colors.grey[200]!),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+      child: Wrap(
+        spacing: 22,
+        runSpacing: 16,
+        alignment: WrapAlignment.spaceEvenly,
         children: [
           _buildStatItem('100%', 'Free', AppIcons.favorite),
-          Container(width: 1, height: 40, color: Colors.grey[300]),
           _buildStatItem('24/7', 'Support', AppIcons.support_agent),
-          Container(width: 1, height: 40, color: Colors.grey[300]),
           _buildStatItem('∞', 'Unlimited', AppIcons.all_inclusive),
         ],
       ),
@@ -653,7 +653,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   Widget _buildStatItem(String value, String label, IconData icon) {
     return Column(
       children: [
-        Icon(icon, color: const Color(0xFF4CAF50), size: 24),
+        Icon(icon, color: AppColors.primary, size: 24),
         const SizedBox(height: 8),
         Text(
           value,

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../helpers/database_helper.dart';
 import '../helpers/dialog_helper.dart';
 import '../models/category.dart';
+import '../theme/app_theme.dart';
 
 class ManageCategoriesScreen extends StatefulWidget {
   const ManageCategoriesScreen({super.key});
@@ -167,7 +168,7 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(
-                      color: Color(0xFF4CAF50),
+                      color: AppColors.primary,
                       width: 2,
                     ),
                   ),
@@ -202,12 +203,12 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4CAF50).withOpacity(0.1),
+                          color: AppColors.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
                           _selectedIconForDialog,
-                          color: const Color(0xFF4CAF50),
+                          color: AppColors.primary,
                           size: 24,
                         ),
                       ),
@@ -322,7 +323,7 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                           }
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4CAF50),
+                    backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     disabledBackgroundColor: Colors.grey[300],
                     padding: const EdgeInsets.symmetric(
@@ -402,7 +403,7 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                         child: Icon(
                           icon,
                           size: 28,
-                          color: const Color(0xFF4CAF50),
+                          color: AppColors.primary,
                         ),
                       ),
                     );
@@ -436,7 +437,7 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
     if (_isLoading) {
       return const Center(
         child: CircularProgressIndicator(
-          color: Color(0xFF4CAF50),
+          color: AppColors.primary,
         ),
       );
     }
@@ -495,12 +496,12 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: const Color(0xFF4CAF50).withOpacity(0.1),
+                color: AppColors.primary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 _getIconForCategory(category),
-                color: const Color(0xFF4CAF50),
+                color: AppColors.primary,
                 size: 24,
               ),
             ),
@@ -592,9 +593,9 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(AppIcons.arrow_back, color: Colors.black87),
@@ -611,9 +612,9 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
         centerTitle: false,
         bottom: TabBar(
           controller: _tabController,
-          labelColor: const Color(0xFF4CAF50),
+          labelColor: AppColors.primary,
           unselectedLabelColor: Colors.grey[600],
-          indicatorColor: const Color(0xFF4CAF50),
+          indicatorColor: AppColors.primary,
           indicatorWeight: 3,
           tabs: const [
             Tab(text: 'Expense'),
@@ -635,7 +636,7 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                 final type = _tabController.index == 0 ? 'expense' : 'income';
                 _showCategoryDialog(type: type);
               },
-        backgroundColor: const Color(0xFF4CAF50),
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         label: const Text('Add Category'),
         icon: const Icon(AppIcons.add),
