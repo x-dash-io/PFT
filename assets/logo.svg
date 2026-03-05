@@ -1,0 +1,62 @@
+<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1F6FEB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00D9FF;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00D9FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6366F1;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="128" cy="128" r="126" fill="url(#primaryGradient)" opacity="0.1"/>
+  
+  <!-- Main Wallet/Card Shape -->
+  <g transform="translate(128, 128)">
+    <!-- Outer card -->
+    <rect x="-60" y="-50" width="120" height="80" rx="16" fill="url(#primaryGradient)" opacity="0.95"/>
+    
+    <!-- Inner card accent -->
+    <rect x="-55" y="-45" width="110" height="70" rx="12" fill="white" opacity="0.15"/>
+    
+    <!-- Top accent line -->
+    <line x1="-50" y1="-35" x2="50" y2="-35" stroke="white" stroke-width="2" opacity="0.4"/>
+    
+    <!-- Coin circles (representing money) -->
+    <g id="coin1" transform="translate(-30, -5)">
+      <circle cx="0" cy="0" r="18" fill="url(#accentGradient)"/>
+      <circle cx="0" cy="0" r="14" fill="white" opacity="0.2"/>
+      <text x="0" y="6" font-size="20" font-weight="bold" fill="white" text-anchor="middle" font-family="Arial">$</text>
+    </g>
+    
+    <!-- Coin 2 -->
+    <g id="coin2" transform="translate(10, 5)">
+      <circle cx="0" cy="0" r="16" fill="#00D9FF" opacity="0.8"/>
+      <circle cx="0" cy="0" r="12" fill="white" opacity="0.2"/>
+      <text x="0" y="5" font-size="18" font-weight="bold" fill="white" text-anchor="middle" font-family="Arial">€</text>
+    </g>
+    
+    <!-- Growth arrow/trend -->
+    <g id="trend">
+      <path d="M 35 15 L 35 -5 M 35 -5 L 25 -5 M 35 -5 L 45 5" 
+            stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      
+      <!-- Trend line -->
+      <polyline points="25,-15 35,-5 45,0 55,5" 
+                stroke="white" stroke-width="2.5" fill="none" 
+                stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+    </g>
+    
+    <!-- Bottom decorative elements -->
+    <circle cx="-40" cy="25" r="3" fill="white" opacity="0.6"/>
+    <circle cx="-20" cy="30" r="3" fill="white" opacity="0.5"/>
+    <circle cx="0" cy="28" r="3" fill="white" opacity="0.4"/>
+    <circle cx="20" cy="25" r="3" fill="white" opacity="0.5"/>
+  </g>
+  
+  <!-- Additional decorative rings (subtle) -->
+  <circle cx="128" cy="128" r="120" fill="none" stroke="url(#primaryGradient)" stroke-width="1" opacity="0.3"/>
+  <circle cx="128" cy="128" r="115" fill="none" stroke="url(#accentGradient)" stroke-width="0.5" opacity="0.2"/>
+</svg>
