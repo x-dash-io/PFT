@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../helpers/database_helper.dart';
 import '../helpers/dialog_helper.dart';
 import '../helpers/notification_service.dart';
@@ -446,10 +447,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                   if (bill.isRecurring) 
                                     Padding(
                                       padding: const EdgeInsets.only(right: 4),
-                                      child: Icon(Icons.sync, size: 14, color: Colors.grey.shade600),
+                                      child: Icon(LucideIcons.repeat, size: 14, color: Colors.grey.shade600),
                                     ),
                                   PopupMenuButton<String>(
-                                    icon: Icon(Icons.more_vert, size: 18, color: Colors.grey.shade600),
+                                    icon: Icon(LucideIcons.moreVertical, size: 18, color: Colors.grey.shade600),
                                     padding: EdgeInsets.zero,
                                     constraints: const BoxConstraints(),
                                     shape: RoundedRectangleBorder(
@@ -467,7 +468,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         value: 'edit',
                                         child: Row(
                                           children: [
-                                            Icon(Icons.edit, size: 20, color: Color(0xFF4CAF50)),
+                                            Icon(LucideIcons.pencil, size: 20, color: Color(0xFF4CAF50)),
                                             SizedBox(width: 8),
                                             Text('Edit'),
                                           ],
@@ -477,7 +478,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         value: 'delete',
                                         child: Row(
                                           children: [
-                                            Icon(Icons.delete_outline, size: 20, color: Colors.red),
+                                            Icon(LucideIcons.trash2, size: 20, color: Colors.red),
                                             SizedBox(width: 8),
                                             Text('Delete'),
                                           ],
@@ -533,28 +534,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 6),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: TextButton(
-                                  style: TextButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                    minimumSize: Size.zero,
+                              const SizedBox(height: 8),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.success,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                   ),
-                                  child: _payingBills.contains(bill.id)
-                                      ? const SizedBox(
-                                          width: 14,
-                                          height: 14,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: Color(0xFF4CAF50),
-                                          ),
-                                        )
-                                      : const Text(
-                                          'Pay Bill',
-                                          style: TextStyle(fontSize: 12),
-                                        ),
                                   onPressed: _payingBills.contains(bill.id)
                                       ? null
                                       : () async {
@@ -622,7 +614,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                               });
                                             }
                                           }
-                                  },
+                                        },
+                                  icon: _payingBills.contains(bill.id)
+                                      ? SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : const Icon(LucideIcons.check, size: 18),
+                                  label: _payingBills.contains(bill.id)
+                                      ? const Text('Processing...', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600))
+                                      : const Text('Pay Bill', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
                                 ),
                               ),
                             ],

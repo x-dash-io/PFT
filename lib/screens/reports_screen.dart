@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../helpers/database_helper.dart';
 import '../helpers/pdf_helper.dart';
 import '../models/transaction.dart' as model;
@@ -371,22 +372,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
     final netFlow = totalIncome - totalExpenses;
 
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 0,
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.white,
-              Colors.grey.shade50,
-            ],
-          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.neutralBorder, width: 1),
+          color: Colors.white,
         ),
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -396,58 +391,57 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF4CAF50).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.trending_up,
-                                color: Color(0xFF4CAF50),
-                                size: 20,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            LucideIcons.trendingUp,
+                            color: AppColors.primary,
+                            size: 22,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
                                 'Cash Flow Analysis',
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
                                 ),
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Detailed financial performance tracking',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 13,
+                              const SizedBox(height: 2),
+                              Text(
+                                'Detailed financial performance tracking',
+                                style: TextStyle(
+                                  color: AppColors.neutralMedium,
+                                  fontSize: 12,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ],
                           ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
                         ),
                       ],
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF4CAF50).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
+                      color: AppColors.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: const Color(0xFF4CAF50).withOpacity(0.3),
+                        color: AppColors.primary.withOpacity(0.3),
                         width: 1,
                       ),
                     ),
@@ -455,55 +449,56 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       _selectedTimeFilter.capitalize(),
                       style: const TextStyle(
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF4CAF50),
-                        fontSize: 12,
+                        color: AppColors.primary,
+                        fontSize: 11,
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 18),
               
               // Statistics Row
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.neutralBackground,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade200),
+                  border: Border.all(color: AppColors.neutralBorder, width: 1),
                 ),
                 child: Row(
                   children: [
                     Expanded(
                       child: _buildStatItem(
                         'Total Income',
-                        'KSh ${compactFormatter.format(totalIncome)}',
-                        const Color(0xFF4CAF50),
-                        Icons.arrow_downward,
+                        '$_currencySymbol${compactFormatter.format(totalIncome)}',
+                        AppColors.success,
+                        LucideIcons.arrowDown,
                       ),
                     ),
-                    Container(width: 1, height: 40, color: Colors.grey.shade300),
+                    Container(width: 1, height: 40, color: AppColors.neutralBorder),
                     Expanded(
                       child: _buildStatItem(
                         'Total Expenses',
-                        'KSh ${compactFormatter.format(totalExpenses)}',
-                        const Color(0xFFE53935),
-                        Icons.arrow_upward,
+                        '$_currencySymbol${compactFormatter.format(totalExpenses)}',
+
+                        AppColors.error,
+                        LucideIcons.arrowUp,
                       ),
                     ),
-                    Container(width: 1, height: 40, color: Colors.grey.shade300),
+                    Container(width: 1, height: 40, color: AppColors.neutralBorder),
                     Expanded(
                       child: _buildStatItem(
                         'Net Flow',
-                        'KSh ${compactFormatter.format(netFlow)}',
-                        netFlow >= 0 ? const Color(0xFF4CAF50) : const Color(0xFFE53935),
-                        Icons.account_balance_wallet,
+                        '$_currencySymbol${compactFormatter.format(netFlow)}',
+                        netFlow >= 0 ? AppColors.success : AppColors.error,
+                        LucideIcons.wallet,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               series.isEmpty
                   ? SizedBox(
                       height: chartHeight,
@@ -511,29 +506,22 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.show_chart, size: 48, color: Colors.grey[400]),
+                            Icon(LucideIcons.barChart2, size: 48, color: AppColors.neutralLight),
                             const SizedBox(height: 12),
                             Text(
                               'No data available for this period',
-                              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                              style: TextStyle(color: AppColors.neutralMedium, fontSize: 14),
                             ),
                           ],
                         ),
                       ),
                     )
                   : Container(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.grey.shade200, width: 1.5),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.03),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+                        color: AppColors.neutralBackground,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.neutralBorder, width: 1),
                       ),
                       child: SizedBox(
                         height: chartHeight,
@@ -870,55 +858,62 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
   Widget _buildIncomeExpenseBarChart(Map<String, double> barChartData) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 0,
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.white,
-              Colors.grey.shade50,
-            ],
-          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.neutralBorder, width: 1),
+          color: Colors.white,
         ),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Income vs Expenses',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Snapshot for ${_selectedTimeFilter.capitalize()}',
-              style: TextStyle(color: Colors.grey[600]),
+            Row(
+              children: [
+                Icon(LucideIcons.barChart3, size: 24, color: AppColors.primary),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Income vs Expenses',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Comparison for ${_selectedTimeFilter.capitalize()}',
+                        style: TextStyle(color: AppColors.neutralMedium, fontSize: 13),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
             SizedBox(
-              height: 240,
+              height: 280,
               child: BarChart(
                 BarChartData(
                   alignment: BarChartAlignment.spaceAround,
                   maxY: _getBarChartMaxY(barChartData),
                   minY: 0,
                   barGroups: [
-                    _buildBarGroupData(0, barChartData['Income'] ?? 0, const Color(0xFF4CAF50), _getBarChartMaxY(barChartData)),
-                    _buildBarGroupData(1, barChartData['Expenses'] ?? 0, const Color(0xFFE53935), _getBarChartMaxY(barChartData)),
+                    _buildBarGroupData(0, barChartData['Income'] ?? 0, AppColors.success, _getBarChartMaxY(barChartData)),
+                    _buildBarGroupData(1, barChartData['Expenses'] ?? 0, AppColors.error, _getBarChartMaxY(barChartData)),
                   ],
                   titlesData: FlTitlesData(
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
                         getTitlesWidget: (value, meta) => Padding(
-                          padding: const EdgeInsets.only(top: 10.0),
+                          padding: const EdgeInsets.only(top: 12.0),
                           child: Text(
                             value.toInt() == 0 ? 'Income' : 'Expenses',
-                            style: const TextStyle(fontWeight: FontWeight.w600),
+                            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.neutralDark),
                           ),
                         ),
                       ),
@@ -926,11 +921,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        reservedSize: 52,
+                        reservedSize: 60,
                         interval: (_getBarChartMaxY(barChartData) / 4).clamp(1, double.infinity),
                         getTitlesWidget: (value, meta) => Text(
-                          currencyFormatter.format(value),
-                          style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.w600),
+                          compactFormatter.format(value),
+                          style: TextStyle(color: AppColors.neutralMedium, fontWeight: FontWeight.w600, fontSize: 12),
                         ),
                       ),
                     ),
@@ -941,13 +936,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     show: true,
                     drawVerticalLine: false,
                     getDrawingHorizontalLine: (value) =>
-                        FlLine(color: Colors.grey.shade300, strokeWidth: 1.5),
+                        FlLine(color: AppColors.neutralBorder, strokeWidth: 1),
                   ),
                   borderData: FlBorderData(
                     show: true,
                     border: Border(
-                      left: BorderSide(color: Colors.grey.shade400, width: 2),
-                      bottom: BorderSide(color: Colors.grey.shade400, width: 2),
+                      left: BorderSide(color: AppColors.neutralBorder, width: 1.5),
+                      bottom: BorderSide(color: AppColors.neutralBorder, width: 1.5),
                       top: BorderSide.none,
                       right: BorderSide.none,
                     ),
@@ -955,15 +950,15 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Row(
               children: [
                 Flexible(
-                  child: _buildLegendItem('Income', const Color(0xFF4CAF50)),
+                  child: _buildLegendItem('Income', AppColors.success),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 20),
                 Flexible(
-                  child: _buildLegendItem('Expenses', const Color(0xFFE53935)),
+                  child: _buildLegendItem('Expenses', AppColors.error),
                 ),
               ],
             ),
@@ -997,19 +992,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
       ..sort((a, b) => b.value.compareTo(a.value));
 
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 0,
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.white,
-              Colors.grey.shade50,
-            ],
-          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.neutralBorder, width: 1),
+          color: Colors.white,
         ),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -1020,32 +1009,45 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
                       children: [
-                        const Text(
-                          'Expense Breakdown',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Top categories for ${_selectedTimeFilter.capitalize()}',
-                          style: TextStyle(color: Colors.grey[600]),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
+                        Icon(LucideIcons.pieChart, size: 24, color: AppColors.primary),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Expense Breakdown',
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Top categories for ${_selectedTimeFilter.capitalize()}',
+                                style: TextStyle(color: AppColors.neutralMedium, fontSize: 13),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Flexible(
-                    child: Text(
-                      'Total $_currencySymbol${totalExpenses.toStringAsFixed(0)}',
-                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      textAlign: TextAlign.right,
-                    ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        'Total',
+                        style: TextStyle(color: AppColors.neutralMedium, fontSize: 12),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '$_currencySymbol${totalExpenses.toStringAsFixed(0)}',
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.primary),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -1059,29 +1061,29 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     return PieChartSectionData(
                       color: _getColorForCategory(entry.key),
                       value: entry.value,
-                      title: '${percentage.toStringAsFixed(1)}%',
-                      radius: 80,
+                      title: '${percentage.toStringAsFixed(0)}%',
+                      radius: 90,
                       titleStyle: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
                         color: Colors.white,
                       ),
                     );
                   }).toList(),
-                  sectionsSpace: 2,
-                  centerSpaceRadius: 40,
+                  sectionsSpace: 1,
+                  centerSpaceRadius: 45,
                 ),
               ),
             ),
             const SizedBox(height: 24),
             ...sortedEntries.take(5).map(
               (entry) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6.0),
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Row(
                   children: [
                     Container(
-                      width: 12,
-                      height: 12,
+                      width: 14,
+                      height: 14,
                       decoration: BoxDecoration(
                         color: _getColorForCategory(entry.key),
                         borderRadius: BorderRadius.circular(4),
@@ -1091,23 +1093,22 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     Expanded(
                       child: Text(
                         entry.key,
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                    Flexible(
-                      child: Text(
-                        '$_currencySymbol${entry.value.toStringAsFixed(0)}',
-                        style: const TextStyle(fontWeight: FontWeight.w700),
+                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
                     ),
                     const SizedBox(width: 8),
                     Text(
+                      '$_currencySymbol${entry.value.toStringAsFixed(0)}',
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
                       '${((entry.value / totalExpenses) * 100).toStringAsFixed(1)}%',
-                      style: TextStyle(color: Colors.grey[600]),
+                      style: TextStyle(color: AppColors.neutralMedium, fontSize: 12),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
