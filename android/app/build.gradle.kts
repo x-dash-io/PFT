@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.pft.app"
+    namespace = "com.example.ledgerlite"
     compileSdk = 36
 
     compileOptions {
@@ -20,7 +20,7 @@ android {
     }
     
     defaultConfig {
-        applicationId = "com.pft.app"
+        applicationId = "com.example.ledgerlite"
         minSdk = flutter.minSdkVersion
         targetSdk = 34
         versionCode = 1

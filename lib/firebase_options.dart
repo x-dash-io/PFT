@@ -17,7 +17,10 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -27,7 +30,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
-        return windows;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for windows - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -40,47 +46,29 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyC6ThfuH33A5hgJlVRNSLpPcX_fusR7Wc0',
-    appId: '1:376182475816:web:default',
-    messagingSenderId: '376182475816',
-    projectId: 'pft-app-aac78',
-    authDomain: 'pft-app-aac78.firebaseapp.com',
-    storageBucket: 'pft-app-aac78.firebasestorage.app',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyC6ThfuH33A5hgJlVRNSLpPcX_fusR7Wc0',
-    appId: '1:376182475816:android:b6d7d3611b6cbf3cf5b91d',
-    messagingSenderId: '376182475816',
-    projectId: 'pft-app-aac78',
-    storageBucket: 'pft-app-aac78.firebasestorage.app',
+    apiKey: 'AIzaSyBP2ZFBwBAJtv41-ifTZ34icb5G9jJrXws',
+    appId: '1:142893563437:android:e66ffed3510e91cc1cc2a4',
+    messagingSenderId: '142893563437',
+    projectId: 'ledgerlite-app',
+    storageBucket: 'ledgerlite-app.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyC6ThfuH33A5hgJlVRNSLpPcX_fusR7Wc0',
-    appId: '1:376182475816:ios:default',
-    messagingSenderId: '376182475816',
-    projectId: 'pft-app-aac78',
-    storageBucket: 'pft-app-aac78.firebasestorage.app',
-    iosBundleId: 'com.pft.app',
+    apiKey: 'AIzaSyA64Z6QAEQjeuOSnkEGhsTn-zEKIqEW5Ww',
+    appId: '1:142893563437:ios:c256c80ab3e5b3c51cc2a4',
+    messagingSenderId: '142893563437',
+    projectId: 'ledgerlite-app',
+    storageBucket: 'ledgerlite-app.firebasestorage.app',
+    iosBundleId: 'com.example.ledgerlite',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyC6ThfuH33A5hgJlVRNSLpPcX_fusR7Wc0',
-    appId: '1:376182475816:ios:default',
-    messagingSenderId: '376182475816',
-    projectId: 'pft-app-aac78',
-    storageBucket: 'pft-app-aac78.firebasestorage.app',
-    iosBundleId: 'com.pft.app',
-  );
-
-  static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyC6ThfuH33A5hgJlVRNSLpPcX_fusR7Wc0',
-    appId: '1:376182475816:web:default',
-    messagingSenderId: '376182475816',
-    projectId: 'pft-app-aac78',
-    authDomain: 'pft-app-aac78.firebaseapp.com',
-    storageBucket: 'pft-app-aac78.firebasestorage.app',
+    apiKey: 'AIzaSyA64Z6QAEQjeuOSnkEGhsTn-zEKIqEW5Ww',
+    appId: '1:142893563437:ios:c256c80ab3e5b3c51cc2a4',
+    messagingSenderId: '142893563437',
+    projectId: 'ledgerlite-app',
+    storageBucket: 'ledgerlite-app.firebasestorage.app',
+    iosBundleId: 'com.example.ledgerlite',
   );
 }

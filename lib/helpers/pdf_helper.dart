@@ -25,8 +25,9 @@ class PdfHelper {
     final pdf = pw.Document();
 
     // Sort transactions by date (newest first)
-    final sortedTransactions = List<model.Transaction>.from(transactions)
-      ..sort((a, b) => DateTime.parse(b.date).compareTo(DateTime.parse(a.date)));
+    final sortedTransactions = List<model.Transaction>.from(
+      transactions,
+    )..sort((a, b) => DateTime.parse(b.date).compareTo(DateTime.parse(a.date)));
 
     pdf.addPage(
       pw.MultiPage(
@@ -39,7 +40,8 @@ class PdfHelper {
           ),
         ),
         header: (pw.Context context) => _buildHeader(userName, timeFilter),
-        footer: (pw.Context context) => _buildFooter(context.pageNumber, context.pagesCount),
+        footer: (pw.Context context) =>
+            _buildFooter(context.pageNumber, context.pagesCount),
         build: (pw.Context context) {
           return [
             _buildExecutiveSummary(sortedTransactions),
@@ -59,10 +61,10 @@ class PdfHelper {
 
   static pw.Widget _buildHeader(String userName, String timeFilter) {
     final now = DateTime.now();
-    final periodText = timeFilter == 'week' 
-        ? 'This Week' 
+    final periodText = timeFilter == 'week'
+        ? 'This Week'
         : (timeFilter == 'month' ? 'This Month' : 'This Year');
-    
+
     return pw.Container(
       padding: const pw.EdgeInsets.only(bottom: 20),
       decoration: const pw.BoxDecoration(
@@ -88,18 +90,12 @@ class PdfHelper {
               pw.SizedBox(height: 4),
               pw.Text(
                 'Generated for: $userName',
-                style: pw.TextStyle(
-                  fontSize: 14,
-                  color: PdfColors.grey700,
-                ),
+                style: pw.TextStyle(fontSize: 14, color: PdfColors.grey700),
               ),
               pw.SizedBox(height: 2),
               pw.Text(
                 'Period: $periodText',
-                style: pw.TextStyle(
-                  fontSize: 12,
-                  color: PdfColors.grey600,
-                ),
+                style: pw.TextStyle(fontSize: 12, color: PdfColors.grey600),
               ),
             ],
           ),
@@ -108,18 +104,12 @@ class PdfHelper {
             children: [
               pw.Text(
                 DateFormat('MMMM dd, yyyy').format(now),
-                style: pw.TextStyle(
-                  fontSize: 12,
-                  color: PdfColors.grey600,
-                ),
+                style: pw.TextStyle(fontSize: 12, color: PdfColors.grey600),
               ),
               pw.SizedBox(height: 2),
               pw.Text(
                 DateFormat('hh:mm a').format(now),
-                style: pw.TextStyle(
-                  fontSize: 10,
-                  color: PdfColors.grey500,
-                ),
+                style: pw.TextStyle(fontSize: 10, color: PdfColors.grey500),
               ),
             ],
           ),
@@ -140,25 +130,21 @@ class PdfHelper {
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
           pw.Text(
-            'Personal Finance Tracker - Confidential Report',
-            style: pw.TextStyle(
-              fontSize: 8,
-              color: PdfColors.grey500,
-            ),
+            'Ledgerlite - Confidential Report',
+            style: pw.TextStyle(fontSize: 8, color: PdfColors.grey500),
           ),
           pw.Text(
             'Page $pageNumber of $totalPages',
-            style: pw.TextStyle(
-              fontSize: 8,
-              color: PdfColors.grey500,
-            ),
+            style: pw.TextStyle(fontSize: 8, color: PdfColors.grey500),
           ),
         ],
       ),
     );
   }
 
-  static pw.Widget _buildExecutiveSummary(List<model.Transaction> transactions) {
+  static pw.Widget _buildExecutiveSummary(
+    List<model.Transaction> transactions,
+  ) {
     double totalIncome = 0;
     double totalExpenses = 0;
     int incomeCount = 0;
@@ -226,7 +212,11 @@ class PdfHelper {
               _buildSummaryCard(
                 'Savings Rate',
                 '${savingsRate.toStringAsFixed(1)}%',
-                savingsRate >= 20 ? PdfColors.green700 : (savingsRate >= 10 ? PdfColors.orange700 : PdfColors.red700),
+                savingsRate >= 20
+                    ? PdfColors.green700
+                    : (savingsRate >= 10
+                          ? PdfColors.orange700
+                          : PdfColors.red700),
                 0,
               ),
               pw.SizedBox(width: 12),
@@ -250,7 +240,12 @@ class PdfHelper {
     );
   }
 
-  static pw.Widget _buildSummaryCard(String label, String value, PdfColor color, int icon) {
+  static pw.Widget _buildSummaryCard(
+    String label,
+    String value,
+    PdfColor color,
+    int icon,
+  ) {
     return pw.Expanded(
       child: pw.Container(
         padding: const pw.EdgeInsets.all(12),
@@ -294,16 +289,20 @@ class PdfHelper {
 
     for (var t in transactions) {
       String categoryName = 'Uncategorized';
-      if (t.categoryId != null && categoryMap != null && categoryMap.containsKey(t.categoryId)) {
+      if (t.categoryId != null &&
+          categoryMap != null &&
+          categoryMap.containsKey(t.categoryId)) {
         categoryName = categoryMap[t.categoryId]!.name;
       } else if (t.categoryId == null) {
         categoryName = _generateSmartDescription(t, categoryMap);
       }
 
       if (t.type == 'expense') {
-        expenseByCategory[categoryName] = (expenseByCategory[categoryName] ?? 0) + t.amount;
+        expenseByCategory[categoryName] =
+            (expenseByCategory[categoryName] ?? 0) + t.amount;
       } else {
-        incomeByCategory[categoryName] = (incomeByCategory[categoryName] ?? 0) + t.amount;
+        incomeByCategory[categoryName] =
+            (incomeByCategory[categoryName] ?? 0) + t.amount;
       }
     }
 
@@ -361,8 +360,16 @@ class PdfHelper {
           decoration: const pw.BoxDecoration(color: PdfColors.grey200),
           children: [
             _buildTableCell('Category', isHeader: true),
-            _buildTableCell('Amount', isHeader: true, align: pw.Alignment.centerRight),
-            _buildTableCell('Percentage', isHeader: true, align: pw.Alignment.centerRight),
+            _buildTableCell(
+              'Amount',
+              isHeader: true,
+              align: pw.Alignment.centerRight,
+            ),
+            _buildTableCell(
+              'Percentage',
+              isHeader: true,
+              align: pw.Alignment.centerRight,
+            ),
           ],
         ),
         ...entries.map((entry) {
@@ -371,8 +378,14 @@ class PdfHelper {
           return pw.TableRow(
             children: [
               _buildTableCell(entry.key),
-              _buildTableCell('KSh ${_formatCurrency(entry.value)}', align: pw.Alignment.centerRight),
-              _buildTableCell('${percentage.toStringAsFixed(1)}%', align: pw.Alignment.centerRight),
+              _buildTableCell(
+                'KSh ${_formatCurrency(entry.value)}',
+                align: pw.Alignment.centerRight,
+              ),
+              _buildTableCell(
+                '${percentage.toStringAsFixed(1)}%',
+                align: pw.Alignment.centerRight,
+              ),
             ],
           );
         }),
@@ -380,7 +393,11 @@ class PdfHelper {
     );
   }
 
-  static pw.Widget _buildTableCell(String text, {bool isHeader = false, pw.Alignment align = pw.Alignment.centerLeft}) {
+  static pw.Widget _buildTableCell(
+    String text, {
+    bool isHeader = false,
+    pw.Alignment align = pw.Alignment.centerLeft,
+  }) {
     return pw.Container(
       padding: const pw.EdgeInsets.all(8),
       alignment: align,
@@ -429,19 +446,28 @@ class PdfHelper {
                 _buildTableCell('Description', isHeader: true),
                 _buildTableCell('Category', isHeader: true),
                 _buildTableCell('Type', isHeader: true),
-                _buildTableCell('Amount', isHeader: true, align: pw.Alignment.centerRight),
+                _buildTableCell(
+                  'Amount',
+                  isHeader: true,
+                  align: pw.Alignment.centerRight,
+                ),
               ],
             ),
             // Data rows
             ...transactions.map((transaction) {
               String categoryName = 'Uncategorized';
-              if (transaction.categoryId != null && categoryMap != null && categoryMap.containsKey(transaction.categoryId)) {
+              if (transaction.categoryId != null &&
+                  categoryMap != null &&
+                  categoryMap.containsKey(transaction.categoryId)) {
                 categoryName = categoryMap[transaction.categoryId]!.name;
               }
 
               String description = transaction.description.trim();
               if (description.isEmpty) {
-                description = _generateSmartDescription(transaction, categoryMap);
+                description = _generateSmartDescription(
+                  transaction,
+                  categoryMap,
+                );
               }
 
               final date = DateTime.parse(transaction.date);
@@ -449,8 +475,8 @@ class PdfHelper {
 
               return pw.TableRow(
                 decoration: pw.BoxDecoration(
-                  color: transaction.type == 'income' 
-                      ? PdfColors.green50 
+                  color: transaction.type == 'income'
+                      ? PdfColors.green50
                       : PdfColors.red50,
                 ),
                 children: [
@@ -485,22 +511,26 @@ class PdfHelper {
 
     for (var t in transactions) {
       String categoryName = 'Uncategorized';
-      if (t.categoryId != null && categoryMap != null && categoryMap.containsKey(t.categoryId)) {
+      if (t.categoryId != null &&
+          categoryMap != null &&
+          categoryMap.containsKey(t.categoryId)) {
         categoryName = categoryMap[t.categoryId]!.name;
       }
 
       if (t.type == 'income') {
         totalIncome += t.amount;
-        incomeByCategory[categoryName] = (incomeByCategory[categoryName] ?? 0) + t.amount;
+        incomeByCategory[categoryName] =
+            (incomeByCategory[categoryName] ?? 0) + t.amount;
       } else {
         totalExpenses += t.amount;
-        expenseByCategory[categoryName] = (expenseByCategory[categoryName] ?? 0) + t.amount;
+        expenseByCategory[categoryName] =
+            (expenseByCategory[categoryName] ?? 0) + t.amount;
       }
     }
 
     final balance = totalIncome - totalExpenses;
-    final avgTransaction = transactions.isNotEmpty 
-        ? (totalIncome + totalExpenses) / transactions.length 
+    final avgTransaction = transactions.isNotEmpty
+        ? (totalIncome + totalExpenses) / transactions.length
         : 0.0;
 
     return pw.Container(
@@ -528,20 +558,51 @@ class PdfHelper {
               pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
-                  _buildSummaryRow('Total Income:', 'KSh ${_formatCurrency(totalIncome)}', PdfColors.green700),
-                  _buildSummaryRow('Total Expenses:', 'KSh ${_formatCurrency(totalExpenses)}', PdfColors.red700),
-                  _buildSummaryRow('Net Balance:', 'KSh ${_formatCurrency(balance)}', 
-                      balance >= 0 ? PdfColors.green700 : PdfColors.red700),
-                  _buildSummaryRow('Avg Transaction:', 'KSh ${_formatCurrency(avgTransaction)}', PdfColors.grey700),
+                  _buildSummaryRow(
+                    'Total Income:',
+                    'KSh ${_formatCurrency(totalIncome)}',
+                    PdfColors.green700,
+                  ),
+                  _buildSummaryRow(
+                    'Total Expenses:',
+                    'KSh ${_formatCurrency(totalExpenses)}',
+                    PdfColors.red700,
+                  ),
+                  _buildSummaryRow(
+                    'Net Balance:',
+                    'KSh ${_formatCurrency(balance)}',
+                    balance >= 0 ? PdfColors.green700 : PdfColors.red700,
+                  ),
+                  _buildSummaryRow(
+                    'Avg Transaction:',
+                    'KSh ${_formatCurrency(avgTransaction)}',
+                    PdfColors.grey700,
+                  ),
                 ],
               ),
               pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
-                  _buildSummaryRow('Total Transactions:', '${transactions.length}', PdfColors.blue700),
-                  _buildSummaryRow('Income Transactions:', '${transactions.where((t) => t.type == 'income').length}', PdfColors.green600),
-                  _buildSummaryRow('Expense Transactions:', '${transactions.where((t) => t.type == 'expense').length}', PdfColors.red600),
-                  _buildSummaryRow('Categories Used:', '${expenseByCategory.length + incomeByCategory.length}', PdfColors.purple700),
+                  _buildSummaryRow(
+                    'Total Transactions:',
+                    '${transactions.length}',
+                    PdfColors.blue700,
+                  ),
+                  _buildSummaryRow(
+                    'Income Transactions:',
+                    '${transactions.where((t) => t.type == 'income').length}',
+                    PdfColors.green600,
+                  ),
+                  _buildSummaryRow(
+                    'Expense Transactions:',
+                    '${transactions.where((t) => t.type == 'expense').length}',
+                    PdfColors.red600,
+                  ),
+                  _buildSummaryRow(
+                    'Categories Used:',
+                    '${expenseByCategory.length + incomeByCategory.length}',
+                    PdfColors.purple700,
+                  ),
                 ],
               ),
             ],
@@ -551,7 +612,11 @@ class PdfHelper {
     );
   }
 
-  static pw.Widget _buildSummaryRow(String label, String value, PdfColor color) {
+  static pw.Widget _buildSummaryRow(
+    String label,
+    String value,
+    PdfColor color,
+  ) {
     return pw.Padding(
       padding: const pw.EdgeInsets.only(bottom: 8),
       child: pw.Row(
@@ -559,10 +624,7 @@ class PdfHelper {
         children: [
           pw.Text(
             label,
-            style: pw.TextStyle(
-              fontSize: 11,
-              color: PdfColors.grey700,
-            ),
+            style: pw.TextStyle(fontSize: 11, color: PdfColors.grey700),
           ),
           pw.SizedBox(width: 20),
           pw.Text(
@@ -579,17 +641,22 @@ class PdfHelper {
   }
 
   // Generate smart description when description is empty
-  static String _generateSmartDescription(model.Transaction transaction, Map<int, Category>? categoryMap) {
+  static String _generateSmartDescription(
+    model.Transaction transaction,
+    Map<int, Category>? categoryMap,
+  ) {
     String categoryName = 'Transaction';
-    
-    if (transaction.categoryId != null && categoryMap != null && categoryMap.containsKey(transaction.categoryId)) {
+
+    if (transaction.categoryId != null &&
+        categoryMap != null &&
+        categoryMap.containsKey(transaction.categoryId)) {
       categoryName = categoryMap[transaction.categoryId]!.name;
     }
 
     final date = DateTime.parse(transaction.date);
     final dayOfWeek = DateFormat('EEEE').format(date);
     final isWeekend = date.weekday == 6 || date.weekday == 7;
-    
+
     String context = '';
     if (transaction.type == 'income') {
       final timeOfDay = date.hour;
@@ -600,7 +667,7 @@ class PdfHelper {
       } else {
         context = 'Evening';
       }
-      
+
       return '$categoryName - $context income on $dayOfWeek';
     } else {
       // Expense descriptions

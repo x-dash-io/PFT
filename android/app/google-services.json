@@ -1,26 +1,51 @@
 {
   "project_info": {
-    "project_number": "376182475816",
-    "project_id": "pft-app-aac78",
-    "storage_bucket": "pft-app-aac78.firebasestorage.app"
+    "project_number": "142893563437",
+    "project_id": "ledgerlite-app",
+    "storage_bucket": "ledgerlite-app.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:376182475816:android:b6d7d3611b6cbf3cf5b91d",
+        "mobilesdk_app_id": "1:142893563437:android:e66ffed3510e91cc1cc2a4",
         "android_client_info": {
-          "package_name": "com.pft.app"
+          "package_name": "com.example.ledgerlite"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "142893563437-ufb8bu449cah0oa9anjra4qlo4mp2kir.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ledgerlite",
+            "certificate_hash": "e2b9e63be20ed8a24b1b87c6789e0d2b89c12617"
+          }
+        },
+        {
+          "client_id": "142893563437-m7dkahhp5fkap95nshe1t1807jg1b14j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyC6ThfuH33A5hgJlVRNSLpPcX_fusR7Wc0"
+          "current_key": "AIzaSyBP2ZFBwBAJtv41-ifTZ34icb5G9jJrXws"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "142893563437-m7dkahhp5fkap95nshe1t1807jg1b14j.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "142893563437-017uu0uh89ob9uqcjtgsbkrrrkivivlq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.ledgerlite"
+              }
+            }
+          ]
         }
       }
     }

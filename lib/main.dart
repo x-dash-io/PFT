@@ -17,14 +17,16 @@ final NotificationService notificationService = NotificationService();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Configure image cache limits to reduce memory usage
   const int maxCacheSize = 50 * 1024 * 1024; // 50MB maximum cache size in bytes
   imageCache.maximumSize = 100; // Maximum number of images to cache
   imageCache.maximumSizeBytes = maxCacheSize;
-  
+
   try {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   } catch (e) {
     debugPrint('Firebase initialization error: $e');
     // If Firebase fails to initialize, we'll still run the app but auth won't work
@@ -34,7 +36,7 @@ Future<void> main() async {
   tz.initializeTimeZones();
 
   try {
-  await notificationService.init();
+    await notificationService.init();
   } catch (e) {
     debugPrint('Notification service initialization error: $e');
   }
@@ -69,7 +71,7 @@ class PersonalFinanceTracker extends StatelessWidget {
       builder: (context, themeService, _) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'Personal Finance Tracker',
+          title: 'Ledgerlite',
           themeMode: themeService.themeMode,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,

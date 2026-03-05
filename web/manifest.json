@@ -1,11 +1,11 @@
 {
-    "name": "Personal Finance Tracker",
-    "short_name": "Finance Tracker",
+    "name": "Ledgerlite",
+    "short_name": "Ledgerlite",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#4F46E5",
     "theme_color": "#4F46E5",
-    "description": "Personal Finance Tracker - Track your income, expenses, and bills.",
+    "description": "Ledgerlite - Track your income, expenses, and bills.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
