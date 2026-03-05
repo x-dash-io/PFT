@@ -10,10 +10,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 class AppIcons {
   AppIcons._();
 
-  static const String _lucideFontFamily = 'Lucide';
-  static const String _lucideFontPackage = 'lucide_icons';
-  static const int _lucideCodePointStart = 0xf100;
-
   static const IconData account_balance = LucideIcons.landmark;
   static const IconData account_balance_wallet = LucideIcons.wallet;
   static const IconData account_balance_wallet_outlined = LucideIcons.wallet;
@@ -107,6 +103,58 @@ class AppIcons {
   static const IconData wifi = LucideIcons.wifi;
   static const IconData work = LucideIcons.briefcase;
 
+  /// Supported category icons that can be persisted and restored.
+  static const List<IconData> categoryPickerIcons = [
+    shopping_cart,
+    restaurant,
+    house,
+    flight,
+    receipt,
+    local_hospital,
+    school,
+    pets,
+    phone_android,
+    wifi,
+    movie,
+    spa,
+    build,
+    book,
+    music_note,
+    directions_car,
+    attach_money,
+    work,
+    card_giftcard,
+    savings,
+    category,
+    source,
+    label,
+    security,
+    favorite,
+    support_agent,
+    water_drop_outlined,
+    lightbulb_outline,
+    cloud_done,
+    backup,
+    notifications,
+    analytics,
+    insights_outlined,
+    account_balance_wallet,
+    account_balance,
+    credit_card_outlined,
+    filter_list,
+    search,
+    repeat,
+    sync,
+    question_answer_outlined,
+    chevron_right,
+    calendar_today,
+    person_outline,
+    lock_outline,
+    money,
+    offline_bolt,
+    picture_as_pdf,
+  ];
+
   static const Map<int, IconData> _legacyCategoryIconCodePointMap = {
     0xe59c: shopping_cart,
     0xe532: restaurant,
@@ -135,15 +183,13 @@ class AppIcons {
 
   /// Rebuilds an icon from persisted category code points.
   ///
-  /// New Lucide picks are reconstructed directly from Lucide font metadata.
+  /// Category icon picks are restored from known icon constants.
   /// Legacy Material picks are mapped into Lucide equivalents.
   static IconData fromCodePoint(int codePoint) {
-    if (codePoint >= _lucideCodePointStart) {
-      return IconData(
-        codePoint,
-        fontFamily: _lucideFontFamily,
-        fontPackage: _lucideFontPackage,
-      );
+    for (final icon in categoryPickerIcons) {
+      if (icon.codePoint == codePoint) {
+        return icon;
+      }
     }
     return _legacyCategoryIconCodePointMap[codePoint] ?? label;
   }

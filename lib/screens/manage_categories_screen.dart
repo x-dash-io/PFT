@@ -29,56 +29,6 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
   ValueNotifier<bool>? _dialogLoadingState;
 
   final _nameController = TextEditingController();
-  static const List<IconData> _selectableIcons = [
-    AppIcons.shopping_cart,
-    AppIcons.restaurant,
-    AppIcons.house,
-    AppIcons.flight,
-    AppIcons.receipt,
-    AppIcons.local_hospital,
-    AppIcons.school,
-    AppIcons.pets,
-    AppIcons.phone_android,
-    AppIcons.wifi,
-    AppIcons.movie,
-    AppIcons.spa,
-    AppIcons.build,
-    AppIcons.book,
-    AppIcons.music_note,
-    AppIcons.directions_car,
-    AppIcons.attach_money,
-    AppIcons.work,
-    AppIcons.card_giftcard,
-    AppIcons.savings,
-    AppIcons.category,
-    AppIcons.source,
-    AppIcons.label,
-    AppIcons.security,
-    AppIcons.favorite,
-    AppIcons.support_agent,
-    AppIcons.water_drop_outlined,
-    AppIcons.lightbulb_outline,
-    AppIcons.cloud_done,
-    AppIcons.backup,
-    AppIcons.notifications,
-    AppIcons.analytics,
-    AppIcons.insights_outlined,
-    AppIcons.account_balance_wallet,
-    AppIcons.account_balance,
-    AppIcons.credit_card_outlined,
-    AppIcons.filter_list,
-    AppIcons.search,
-    AppIcons.repeat,
-    AppIcons.sync,
-    AppIcons.question_answer_outlined,
-    AppIcons.chevron_right,
-    AppIcons.calendar_today,
-    AppIcons.person_outline,
-    AppIcons.lock_outline,
-    AppIcons.money,
-    AppIcons.offline_bolt,
-    AppIcons.picture_as_pdf,
-  ];
 
   @override
   void initState() {
@@ -401,9 +351,9 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen>
                     mainAxisSpacing: 16,
                     childAspectRatio: 1.0,
                   ),
-                  itemCount: _selectableIcons.length,
+                  itemCount: AppIcons.categoryPickerIcons.length,
                   itemBuilder: (context, index) {
-                    final icon = _selectableIcons[index];
+                    final icon = AppIcons.categoryPickerIcons[index];
                     return InkWell(
                       onTap: () => Navigator.of(context).pop(icon),
                       borderRadius: BorderRadius.circular(12),
