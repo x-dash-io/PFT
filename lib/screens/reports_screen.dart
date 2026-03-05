@@ -22,6 +22,10 @@ class ReportsScreen extends StatefulWidget {
 
 class _ReportsScreenState extends State<ReportsScreen> {
   late Future<Map<String, dynamic>> _reportDataFuture;
+  Map<String, dynamic> _cachedReportData = const {
+    'transactions': <model.Transaction>[],
+    'categoryMap': <int, Category>{},
+  };
   final NumberFormat _compactFormatter = NumberFormat.compact();
   final NumberFormat _currencyFormatter =
       NumberFormat.currency(symbol: '', decimalDigits: 0);
@@ -363,19 +367,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
           child: FutureBuilder<Map<String, dynamic>>(
             future: _reportDataFuture,
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return _LoadingState(onRefresh: _refreshReports);
+              if (snapshot.hasData) {
+                _cachedReportData = snapshot.data!;
               }
 
-              if (snapshot.hasError) {
-                return _ErrorState(
-                  message: 'Could not load report data',
-                  details: snapshot.error.toString(),
-                  onRetry: _refreshReports,
-                );
-              }
-
-              final reportData = snapshot.data ?? const <String, dynamic>{};
+              final isWaiting =
+                  snapshot.connectionState == ConnectionState.waiting;
+              final reportData = snapshot.data ?? _cachedReportData;
               final transactions =
                   reportData['transactions'] as List<model.Transaction>? ??
                       <model.Transaction>[];
@@ -383,86 +381,173 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   reportData['categoryMap'] as Map<int, Category>? ??
                       <int, Category>{};
 
-              if (transactions.isEmpty) {
-                return _buildEmptyState();
+              if (snapshot.hasError) {
+                if (transactions.isNotEmpty) {
+                  return _buildReportsContent(
+                    transactions: transactions,
+                    categoryMap: categoryMap,
+                  );
+                }
+                return _ErrorState(
+                  message: 'Could not load report data',
+                  details: snapshot.error.toString(),
+                  onRetry: _refreshReports,
+                );
               }
 
-              final periodTransactions = _filterTransactionsByPeriod(
-                  transactions, _selectedTimeFilter);
-              final summary =
-                  _buildSummaryStats(transactions, _selectedTimeFilter);
-              final expenseData =
-                  _prepareExpenseData(periodTransactions, categoryMap);
-              final cashFlowSeries =
-                  _buildCashFlowSeries(transactions, _selectedTimeFilter);
+              if (transactions.isEmpty && isWaiting) {
+                return _buildReportsLoadingSkeleton();
+              }
 
-              final expenseTransactionCount = periodTransactions
-                  .where((transaction) => transaction.type == 'expense')
-                  .length;
-              final averageExpense = expenseTransactionCount == 0
-                  ? 0.0
-                  : summary.expenses / expenseTransactionCount;
-
-              final savingsRate = summary.income == 0
-                  ? 0.0
-                  : ((summary.netFlow / summary.income) * 100)
-                      .clamp(-999.0, 999.0);
-
-              return RefreshIndicator(
-                onRefresh: _refreshReports,
-                child: ListView(
-                  physics: const AlwaysScrollableScrollPhysics(
-                    parent: BouncingScrollPhysics(),
+              return Stack(
+                children: [
+                  _buildReportsContent(
+                    transactions: transactions,
+                    categoryMap: categoryMap,
                   ),
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
-                  children: [
-                    _buildHeader(),
-                    const SizedBox(height: 16),
-                    _buildFilterControl(),
-                    const SizedBox(height: 16),
-                    _ReportHeroCard(
-                      periodLabel: _periodLabel(_selectedTimeFilter),
-                      value: _formatAmount(summary.netFlow),
-                      subtitle: summary.tip,
-                      transactionCount: periodTransactions.length,
-                      accentColor: summary.accentColor,
+                  if (isWaiting)
+                    const Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: LinearProgressIndicator(minHeight: 2),
                     ),
-                    const SizedBox(height: 16),
-                    _buildKpiGrid(
-                      income: summary.income,
-                      expenses: summary.expenses,
-                      transactionCount: periodTransactions.length,
-                      averageExpense: averageExpense,
-                      savingsRate: savingsRate,
-                    ),
-                    const SizedBox(height: 20),
-                    _buildCashFlowCard(cashFlowSeries),
-                    const SizedBox(height: 22),
-                    _buildExpenseBreakdown(expenseData, categoryMap),
-                    const SizedBox(height: 28),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () =>
-                            _exportReport(periodTransactions, categoryMap),
-                        icon: const Icon(AppIcons.picture_as_pdf),
-                        label: Text(
-                          'Export ${_capitalize(_selectedTimeFilter)} PDF',
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size.fromHeight(54),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                ],
               );
             },
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildReportsLoadingSkeleton() {
+    return RefreshIndicator(
+      onRefresh: _refreshReports,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+        children: [
+          _buildHeader(),
+          const SizedBox(height: 16),
+          _buildLoadingBlock(height: 54, radius: 14),
+          const SizedBox(height: 16),
+          _buildLoadingBlock(height: 170, radius: 22),
+          const SizedBox(height: 16),
+          _buildLoadingBlock(height: 124, radius: 16),
+          const SizedBox(height: 12),
+          _buildLoadingBlock(height: 124, radius: 16),
+          const SizedBox(height: 20),
+          _buildLoadingBlock(height: 318, radius: 18),
+          const SizedBox(height: 22),
+          _buildLoadingBlock(height: 360, radius: 18),
+          const SizedBox(height: 28),
+          _buildLoadingBlock(height: 54, radius: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoadingBlock({
+    required double height,
+    double? width,
+    double radius = 14,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surface = isDark
+        ? AppColors.darkCardBackground
+        : Theme.of(context).colorScheme.surface;
+    final borderColor =
+        isDark ? AppColors.darkNeutralBorder : AppColors.neutralBorder;
+
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: surface,
+        borderRadius: BorderRadius.circular(radius),
+        border: Border.all(color: borderColor),
+      ),
+    );
+  }
+
+  Widget _buildReportsContent({
+    required List<model.Transaction> transactions,
+    required Map<int, Category> categoryMap,
+  }) {
+    if (transactions.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    final periodTransactions =
+        _filterTransactionsByPeriod(transactions, _selectedTimeFilter);
+    final summary = _buildSummaryStats(transactions, _selectedTimeFilter);
+    final expenseData = _prepareExpenseData(periodTransactions, categoryMap);
+    final cashFlowSeries =
+        _buildCashFlowSeries(transactions, _selectedTimeFilter);
+
+    final expenseTransactionCount = periodTransactions
+        .where((transaction) => transaction.type == 'expense')
+        .length;
+    final averageExpense = expenseTransactionCount == 0
+        ? 0.0
+        : summary.expenses / expenseTransactionCount;
+
+    final savingsRate = summary.income == 0
+        ? 0.0
+        : ((summary.netFlow / summary.income) * 100).clamp(-999.0, 999.0);
+
+    return RefreshIndicator(
+      onRefresh: _refreshReports,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+        children: [
+          _buildHeader(),
+          const SizedBox(height: 16),
+          _buildFilterControl(),
+          const SizedBox(height: 16),
+          _ReportHeroCard(
+            periodLabel: _periodLabel(_selectedTimeFilter),
+            value: _formatAmount(summary.netFlow),
+            subtitle: summary.tip,
+            transactionCount: periodTransactions.length,
+            accentColor: summary.accentColor,
+          ),
+          const SizedBox(height: 16),
+          _buildKpiGrid(
+            income: summary.income,
+            expenses: summary.expenses,
+            transactionCount: periodTransactions.length,
+            averageExpense: averageExpense,
+            savingsRate: savingsRate,
+          ),
+          const SizedBox(height: 20),
+          _buildCashFlowCard(cashFlowSeries),
+          const SizedBox(height: 22),
+          _buildExpenseBreakdown(expenseData, categoryMap),
+          const SizedBox(height: 28),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () => _exportReport(periodTransactions, categoryMap),
+              icon: const Icon(AppIcons.picture_as_pdf),
+              label: Text(
+                'Export ${_capitalize(_selectedTimeFilter)} PDF',
+              ),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(54),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1574,26 +1659,6 @@ class _CategoryBreakdownRow extends StatelessWidget {
                   fontWeight: FontWeight.w800,
                 ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _LoadingState extends StatelessWidget {
-  final Future<void> Function() onRefresh;
-
-  const _LoadingState({required this.onRefresh});
-
-  @override
-  Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: onRefresh,
-      child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: const [
-          SizedBox(height: 220),
-          Center(child: CircularProgressIndicator()),
         ],
       ),
     );

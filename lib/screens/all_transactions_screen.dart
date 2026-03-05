@@ -39,21 +39,31 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
   }
 
   Future<void> _loadInitialData() async {
-    if (_currentUser == null) return;
-    if (mounted) setState(() => _isLoading = true);
+    if (_currentUser == null) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      return;
+    }
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
 
     // Load both transactions and categories
     final transactions = await dbHelper.getTransactions(_currentUser.uid);
     final categories = await dbHelper.getCategories(_currentUser.uid);
 
-    if (mounted) {
-      setState(() {
-        _allTransactions = transactions;
-        _allCategories = categories;
-        _isLoading = false;
-        _applyAllFilters(); // Apply initial (empty) filters
-      });
-    }
+    if (!mounted) return;
+    setState(() {
+      _allTransactions = transactions;
+      _allCategories = categories;
+      _isLoading = false;
+    });
+    _applyAllFilters();
   }
 
   /// Applies all active filters (search, category, type, date range) to the transaction list
@@ -248,211 +258,231 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: TextField(
-                    controller: _searchController,
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 16),
-                    decoration: InputDecoration(
-                      hintText: 'Search by description or amount',
-                      prefixIcon: const Icon(AppIcons.search),
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 16),
-                    ),
-                  ),
+      body: Column(
+        children: [
+          if (_isLoading) const LinearProgressIndicator(minHeight: 2),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: _searchController,
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+              decoration: InputDecoration(
+                hintText: 'Search by description or amount',
+                prefixIcon: const Icon(AppIcons.search),
+                filled: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
                 ),
-                Expanded(
-                  child: _filteredTransactions.isEmpty
-                      ? const Center(
-                          child: Text('No transactions match your filters.'))
-                      : ListView.builder(
-                          itemCount: _filteredTransactions.length,
-                          itemBuilder: (context, index) {
-                            final transaction = _filteredTransactions[index];
-                            final isIncome = transaction.type == 'income';
-                            final amountColor =
-                                isIncome ? AppColors.success : AppColors.error;
-                            final amountPrefix = isIncome ? '+' : '-';
-                            final categoryName =
-                                _categoryNameFor(transaction.categoryId);
-                            final visual = resolveTransactionVisual(
-                              type: transaction.type,
-                              description: transaction.description,
-                              categoryName: categoryName,
-                            );
-                            final isDark =
-                                Theme.of(context).brightness == Brightness.dark;
-                            final baseSurface =
-                                Theme.of(context).colorScheme.surface;
-                            final cardStart = Color.lerp(
-                                  baseSurface,
-                                  visual.accent,
-                                  isDark ? 0.2 : 0.08,
-                                ) ??
-                                baseSurface;
-                            final cardEnd = Color.lerp(
-                                  baseSurface,
-                                  amountColor,
-                                  isDark ? 0.12 : 0.04,
-                                ) ??
-                                baseSurface;
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              ),
+            ),
+          ),
+          Expanded(
+            child: _isLoading && _allTransactions.isEmpty
+                ? _buildTransactionsLoadingList()
+                : _filteredTransactions.isEmpty
+                    ? Center(
+                        child: Text(
+                          _allTransactions.isEmpty
+                              ? 'No transactions yet.'
+                              : 'No transactions match your filters.',
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: _filteredTransactions.length,
+                        itemBuilder: (context, index) {
+                          final transaction = _filteredTransactions[index];
+                          final isIncome = transaction.type == 'income';
+                          final amountColor =
+                              isIncome ? AppColors.success : AppColors.error;
+                          final amountPrefix = isIncome ? '+' : '-';
+                          final categoryName =
+                              _categoryNameFor(transaction.categoryId);
+                          final visual = resolveTransactionVisual(
+                            type: transaction.type,
+                            description: transaction.description,
+                            categoryName: categoryName,
+                          );
+                          final isDark =
+                              Theme.of(context).brightness == Brightness.dark;
+                          final baseSurface =
+                              Theme.of(context).colorScheme.surface;
+                          final cardStart = Color.lerp(
+                                baseSurface,
+                                visual.accent,
+                                isDark ? 0.2 : 0.08,
+                              ) ??
+                              baseSurface;
+                          final cardEnd = Color.lerp(
+                                baseSurface,
+                                amountColor,
+                                isDark ? 0.12 : 0.04,
+                              ) ??
+                              baseSurface;
 
-                            return Container(
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 16.0,
-                                vertical: 6.0,
+                          return Container(
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                              vertical: 6.0,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [cardStart, cardEnd],
                               ),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [cardStart, cardEnd],
-                                ),
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: visual.accent
+                                    .withValues(alpha: isDark ? 0.34 : 0.22),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
                                   color: visual.accent
-                                      .withValues(alpha: isDark ? 0.34 : 0.22),
+                                      .withValues(alpha: isDark ? 0.18 : 0.11),
+                                  blurRadius: 11,
+                                  offset: const Offset(0, 6),
                                 ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: visual.accent.withValues(
-                                        alpha: isDark ? 0.18 : 0.11),
-                                    blurRadius: 11,
-                                    offset: const Offset(0, 6),
+                              ],
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(14),
+                                onTap: () async {
+                                  final result =
+                                      await Navigator.of(context).push<bool>(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          TransactionDetailScreen(
+                                        transaction: transaction,
+                                      ),
+                                    ),
+                                  );
+                                  if (result == true) {
+                                    _loadInitialData();
+                                  }
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 12,
                                   ),
-                                ],
-                              ),
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(14),
-                                  onTap: () async {
-                                    final result =
-                                        await Navigator.of(context).push<bool>(
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            TransactionDetailScreen(
-                                          transaction: transaction,
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(9),
+                                        decoration: BoxDecoration(
+                                          color: visual.accent
+                                              .withValues(alpha: 0.14),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          border: Border.all(
+                                            color: visual.accent
+                                                .withValues(alpha: 0.3),
+                                          ),
+                                        ),
+                                        child: Icon(
+                                          visual.icon,
+                                          color: visual.accent,
+                                          size: 19,
                                         ),
                                       ),
-                                    );
-                                    if (result == true) {
-                                      _loadInitialData();
-                                    }
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 14,
-                                      vertical: 12,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.all(9),
-                                          decoration: BoxDecoration(
-                                            color: visual.accent
-                                                .withValues(alpha: 0.14),
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            border: Border.all(
-                                              color: visual.accent
-                                                  .withValues(alpha: 0.3),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              transaction.description.isEmpty
+                                                  ? transaction.type
+                                                      .capitalize()
+                                                  : transaction.description,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
-                                          ),
-                                          child: Icon(
-                                            visual.icon,
-                                            color: visual.accent,
-                                            size: 19,
-                                          ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              categoryName != null
+                                                  ? '${transaction.date.split('T')[0]} • $categoryName'
+                                                  : transaction.date
+                                                      .split('T')[0],
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall
+                                                  ?.copyWith(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onSurfaceVariant,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
                                         ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                transaction.description.isEmpty
-                                                    ? transaction.type
-                                                        .capitalize()
-                                                    : transaction.description,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .bodyMedium
-                                                    ?.copyWith(
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                    ),
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                          maxWidth: (MediaQuery.sizeOf(context)
+                                                      .width *
+                                                  0.38)
+                                              .clamp(110.0, 160.0)
+                                              .toDouble(),
+                                        ),
+                                        child: Text(
+                                          '$amountPrefix${currencyFormatter.format(transaction.amount)}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleSmall
+                                              ?.copyWith(
+                                                color: amountColor,
+                                                fontWeight: FontWeight.w800,
                                               ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                categoryName != null
-                                                    ? '${transaction.date.split('T')[0]} • $categoryName'
-                                                    : transaction.date
-                                                        .split('T')[0],
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .bodySmall
-                                                    ?.copyWith(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .onSurfaceVariant,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                    ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ],
-                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.end,
                                         ),
-                                        const SizedBox(width: 8),
-                                        ConstrainedBox(
-                                          constraints: BoxConstraints(
-                                            maxWidth:
-                                                (MediaQuery.sizeOf(context)
-                                                            .width *
-                                                        0.38)
-                                                    .clamp(110.0, 160.0)
-                                                    .toDouble(),
-                                          ),
-                                          child: Text(
-                                            '$amountPrefix${currencyFormatter.format(transaction.amount)}',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleSmall
-                                                ?.copyWith(
-                                                  color: amountColor,
-                                                  fontWeight: FontWeight.w800,
-                                                ),
-                                            overflow: TextOverflow.ellipsis,
-                                            textAlign: TextAlign.end,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                            );
-                          },
-                        ),
-                ),
-              ],
-            ),
+                            ),
+                          );
+                        },
+                      ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTransactionsLoadingList() {
+    return ListView.builder(
+      itemCount: 6,
+      itemBuilder: (context, index) {
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+          height: 76,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(14),
+            border:
+                Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+          ),
+        );
+      },
     );
   }
 }

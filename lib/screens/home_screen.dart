@@ -30,8 +30,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final dbHelper = DatabaseHelper();
   List<model.Transaction> _transactions = [];
   List<Bill> _bills = [];
-  bool _isLoading = true;
   final Set<int> _payingBills = <int>{};
+  bool _isRefreshingData = false;
+  bool _hasLoadedOnce = false;
   double _totalIncome = 0.0;
   double _totalExpenses = 0.0;
   double _balance = 0.0;
@@ -49,10 +50,6 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!mounted) return;
     if (_currentUser != null) {
       _refreshData();
-    } else {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
     }
   }
 
@@ -66,10 +63,19 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _refreshData() async {
     if (!mounted) return;
     if (_currentUser == null) {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() {
+          _hasLoadedOnce = true;
+        });
+      }
       return;
     }
-    if (mounted) setState(() => _isLoading = true);
+
+    if (mounted) {
+      setState(() {
+        _isRefreshingData = true;
+      });
+    }
 
     try {
       await Future.wait([
@@ -82,7 +88,8 @@ class _HomeScreenState extends State<HomeScreen> {
     } finally {
       if (mounted) {
         setState(() {
-          _isLoading = false;
+          _isRefreshingData = false;
+          _hasLoadedOnce = true;
         });
       }
     }
@@ -248,6 +255,8 @@ class _HomeScreenState extends State<HomeScreen> {
       stream: FirebaseAuth.instance.userChanges(),
       builder: (context, snapshot) {
         final currentUser = snapshot.data;
+        final showLoadingSkeleton =
+            !_hasLoadedOnce && _transactions.isEmpty && _bills.isEmpty;
         return Scaffold(
           body: Container(
             decoration: BoxDecoration(
@@ -261,28 +270,37 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             child: SafeArea(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : RefreshIndicator(
-                      onRefresh: _refreshData,
-                      child: ListView(
-                        physics: const AlwaysScrollableScrollPhysics(
-                          parent: BouncingScrollPhysics(),
-                        ),
-                        padding: const EdgeInsets.fromLTRB(20, 12, 20, 120),
-                        children: [
-                          _buildHeader(currentUser),
-                          const SizedBox(height: 18),
-                          _buildSummaryCards(),
-                          const SizedBox(height: 22),
-                          _buildUpcomingBillsSection(currentUser),
-                          const SizedBox(height: 22),
-                          _buildTransactionHeader(currentUser),
-                          const SizedBox(height: 8),
-                          _buildTransactionList(currentUser),
-                        ],
+              child: RefreshIndicator(
+                onRefresh: _refreshData,
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
+                  ),
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 120),
+                  children: [
+                    _buildHeader(currentUser),
+                    if (_isRefreshingData) ...[
+                      const SizedBox(height: 10),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(999),
+                        child: const LinearProgressIndicator(minHeight: 3),
                       ),
-                    ),
+                    ],
+                    const SizedBox(height: 18),
+                    if (showLoadingSkeleton) ...[
+                      _buildHomeLoadingSkeleton(),
+                    ] else ...[
+                      _buildSummaryCards(),
+                      const SizedBox(height: 22),
+                      _buildUpcomingBillsSection(currentUser),
+                      const SizedBox(height: 22),
+                      _buildTransactionHeader(currentUser),
+                      const SizedBox(height: 8),
+                      _buildTransactionList(currentUser),
+                    ],
+                  ],
+                ),
+              ),
             ),
           ),
           floatingActionButton: FloatingActionButton.extended(
@@ -314,6 +332,64 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildHomeLoadingSkeleton() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (int i = 0; i < 3; i++) ...[
+          _buildLoadingBlock(height: 92, radius: 16),
+          if (i < 2) const SizedBox(height: 10),
+        ],
+        const SizedBox(height: 20),
+        _buildLoadingBlock(height: 24, width: 170, radius: 8),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 214,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 2,
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            itemBuilder: (_, __) => SizedBox(
+              width:
+                  (MediaQuery.sizeOf(context).width * 0.74).clamp(250.0, 330.0),
+              child: _buildLoadingBlock(height: 214, radius: 18),
+            ),
+          ),
+        ),
+        const SizedBox(height: 22),
+        _buildLoadingBlock(height: 24, width: 190, radius: 8),
+        const SizedBox(height: 12),
+        _buildLoadingBlock(height: 74, radius: 14),
+        const SizedBox(height: 10),
+        _buildLoadingBlock(height: 74, radius: 14),
+      ],
+    );
+  }
+
+  Widget _buildLoadingBlock({
+    required double height,
+    double? width,
+    double radius = 12,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final baseColor = isDark
+        ? AppColors.darkCardBackground.withValues(alpha: 0.88)
+        : AppColors.white;
+    final borderColor =
+        isDark ? AppColors.darkNeutralBorder : AppColors.neutralBorder;
+
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: baseColor,
+        borderRadius: BorderRadius.circular(radius),
+        border: Border.all(color: borderColor),
+      ),
     );
   }
 
