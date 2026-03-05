@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../main.dart'; // Import MainScreen to navigate to it
 import '../helpers/dialog_helper.dart';
+import '../theme/app_theme.dart';
 
 class PasscodeScreen extends StatefulWidget {
   final bool isSettingPasscode;

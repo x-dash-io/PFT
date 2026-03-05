@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../helpers/dialog_helper.dart';
+import '../theme/app_theme.dart';
 import '../auth_gate.dart';
 import 'signup_screen.dart';
 

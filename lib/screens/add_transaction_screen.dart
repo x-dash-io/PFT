@@ -6,6 +6,7 @@ import '../helpers/dialog_helper.dart';
 import '../helpers/date_picker_helper.dart';
 import '../models/category.dart';
 import '../models/transaction.dart' as model;
+import '../theme/app_theme.dart';
 import 'manage_categories_screen.dart';
 
 class AddTransactionScreen extends StatefulWidget {

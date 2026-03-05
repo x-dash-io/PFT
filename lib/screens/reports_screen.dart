@@ -8,6 +8,7 @@ import '../helpers/database_helper.dart';
 import '../helpers/pdf_helper.dart';
 import '../models/transaction.dart' as model;
 import '../models/category.dart';
+import '../theme/app_theme.dart';
 
 class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key});

@@ -6,6 +6,7 @@ import '../helpers/date_picker_helper.dart';
 import '../models/category.dart';
 import '../models/transaction.dart' as model;
 import 'transaction_detail_screen.dart';
+import '../theme/app_theme.dart';
 
 class AllTransactionsScreen extends StatefulWidget {
   const AllTransactionsScreen({super.key});
