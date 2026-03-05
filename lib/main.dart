@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'auth_gate.dart';
 import 'firebase_options.dart';
 import 'helpers/notification_service.dart';
-import 'package:flutter/material.dart';
+import 'helpers/theme_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/reports_screen.dart';
 import 'screens/profile_screen.dart';
@@ -38,8 +39,15 @@ Future<void> main() async {
     debugPrint('Notification service initialization error: $e');
   }
 
+  // Initialize ThemeService
+  final themeService = ThemeService();
+  await themeService.init();
+
   runApp(
-    const PersonalFinanceTracker(),
+    ChangeNotifierProvider<ThemeService>(
+      create: (_) => themeService,
+      child: const PersonalFinanceTracker(),
+    ),
   );
 }
 
@@ -57,12 +65,17 @@ class PersonalFinanceTracker extends StatelessWidget {
       ),
     );
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Personal Finance Tracker',
-      themeMode: ThemeMode.light,
-      theme: AppTheme.lightTheme,
-      home: const AuthGate(),
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Personal Finance Tracker',
+          themeMode: themeService.themeMode,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          home: const AuthGate(),
+        );
+      },
     );
   }
 }
