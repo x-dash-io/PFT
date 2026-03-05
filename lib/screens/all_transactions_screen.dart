@@ -8,6 +8,7 @@ import '../models/category.dart';
 import '../models/transaction.dart' as model;
 import 'transaction_detail_screen.dart';
 import '../theme/app_theme.dart';
+import '../theme/transaction_visuals.dart';
 
 class AllTransactionsScreen extends StatefulWidget {
   const AllTransactionsScreen({super.key});
@@ -42,8 +43,8 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
     if (mounted) setState(() => _isLoading = true);
 
     // Load both transactions and categories
-    final transactions = await dbHelper.getTransactions(_currentUser!.uid);
-    final categories = await dbHelper.getCategories(_currentUser!.uid);
+    final transactions = await dbHelper.getTransactions(_currentUser.uid);
+    final categories = await dbHelper.getCategories(_currentUser.uid);
 
     if (mounted) {
       setState(() {
@@ -87,6 +88,14 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
     });
   }
 
+  String? _categoryNameFor(int? categoryId) {
+    if (categoryId == null) return null;
+    for (final category in _allCategories) {
+      if (category.id == categoryId) return category.name;
+    }
+    return null;
+  }
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -119,8 +128,8 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
 
                   // Filter by Type
                   DropdownButtonFormField<String>(
-                    value: _filterType,
-                    hint: Text('Filter by Type'),
+                    initialValue: _filterType,
+                    hint: const Text('Filter by Type'),
                     decoration:
                         const InputDecoration(border: OutlineInputBorder()),
                     items: const [
@@ -135,8 +144,8 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
 
                   // Filter by Category
                   DropdownButtonFormField<int>(
-                    value: _filterCategoryId,
-                    hint: Text('Filter by Category'),
+                    initialValue: _filterCategoryId,
+                    hint: const Text('Filter by Category'),
                     decoration:
                         const InputDecoration(border: OutlineInputBorder()),
                     items: _allCategories
@@ -163,7 +172,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
-                    trailing: Icon(AppIcons.calendar_today),
+                    trailing: const Icon(AppIcons.calendar_today),
                     onTap: () async {
                       final picked =
                           await DatePickerHelper.showModernDateRangePicker(
@@ -199,7 +208,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                           _applyAllFilters();
                           Navigator.pop(context);
                         },
-                        child: Text('Reset'),
+                        child: const Text('Reset'),
                       ),
                       const SizedBox(width: 8),
                       ElevatedButton(
@@ -209,7 +218,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                           _applyAllFilters();
                           Navigator.pop(context);
                         },
-                        child: Text('Apply'),
+                        child: const Text('Apply'),
                       ),
                     ],
                   ),
@@ -230,10 +239,10 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('All Transactions'),
+        title: const Text('All Transactions'),
         actions: [
           IconButton(
-            icon: Icon(AppIcons.filter_list),
+            icon: const Icon(AppIcons.filter_list),
             onPressed: _showFilterSheet,
             tooltip: 'Filter Transactions',
           ),
@@ -252,7 +261,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                         fontSize: 16),
                     decoration: InputDecoration(
                       hintText: 'Search by description or amount',
-                      prefixIcon: Icon(AppIcons.search),
+                      prefixIcon: const Icon(AppIcons.search),
                       filled: true,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -273,80 +282,170 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                             final transaction = _filteredTransactions[index];
                             final isIncome = transaction.type == 'income';
                             final amountColor =
-                                isIncome ? AppColors.primary : Colors.red;
+                                isIncome ? AppColors.success : AppColors.error;
                             final amountPrefix = isIncome ? '+' : '-';
+                            final categoryName =
+                                _categoryNameFor(transaction.categoryId);
+                            final visual = resolveTransactionVisual(
+                              type: transaction.type,
+                              description: transaction.description,
+                              categoryName: categoryName,
+                            );
+                            final isDark =
+                                Theme.of(context).brightness == Brightness.dark;
+                            final baseSurface =
+                                Theme.of(context).colorScheme.surface;
+                            final cardStart = Color.lerp(
+                                  baseSurface,
+                                  visual.accent,
+                                  isDark ? 0.2 : 0.08,
+                                ) ??
+                                baseSurface;
+                            final cardEnd = Color.lerp(
+                                  baseSurface,
+                                  amountColor,
+                                  isDark ? 0.12 : 0.04,
+                                ) ??
+                                baseSurface;
 
-                            return Card(
+                            return Container(
                               margin: const EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 6.0),
-                              elevation: 1,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12)),
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
-                                leading: Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: amountColor.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Icon(
-                                      isIncome
-                                          ? AppIcons.arrow_downward
-                                          : AppIcons.arrow_upward,
-                                      color: amountColor,
-                                      size: 20),
+                                horizontal: 16.0,
+                                vertical: 6.0,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [cardStart, cardEnd],
                                 ),
-                                title: Text(
-                                  transaction.description.isEmpty
-                                      ? transaction.type.capitalize()
-                                      : transaction.description,
-                                  style: TextStyle(fontWeight: FontWeight.w500),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: visual.accent
+                                      .withValues(alpha: isDark ? 0.34 : 0.22),
                                 ),
-                                subtitle: Padding(
-                                  padding: const EdgeInsets.only(top: 4),
-                                  child: Text(
-                                    transaction.date.split('T')[0],
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurfaceVariant,
-                                        fontSize: 12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: visual.accent.withValues(
+                                        alpha: isDark ? 0.18 : 0.11),
+                                    blurRadius: 11,
+                                    offset: const Offset(0, 6),
                                   ),
-                                ),
-                                trailing: ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                    maxWidth:
-                                        (MediaQuery.sizeOf(context).width *
-                                                0.38)
-                                            .clamp(110.0, 160.0)
-                                            .toDouble(),
-                                  ),
-                                  child: Text(
-                                    '$amountPrefix${currencyFormatter.format(transaction.amount)}',
-                                    style: TextStyle(
-                                        color: amountColor,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16),
-                                    overflow: TextOverflow.ellipsis,
-                                    textAlign: TextAlign.end,
-                                  ),
-                                ),
-                                onTap: () async {
-                                  final result =
-                                      await Navigator.of(context).push<bool>(
-                                    MaterialPageRoute(
+                                ],
+                              ),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(14),
+                                  onTap: () async {
+                                    final result =
+                                        await Navigator.of(context).push<bool>(
+                                      MaterialPageRoute(
                                         builder: (context) =>
                                             TransactionDetailScreen(
-                                                transaction: transaction)),
-                                  );
-                                  if (result == true) {
-                                    _loadInitialData(); // Use the full reload to get fresh data
-                                  }
-                                },
+                                          transaction: transaction,
+                                        ),
+                                      ),
+                                    );
+                                    if (result == true) {
+                                      _loadInitialData();
+                                    }
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                      vertical: 12,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(9),
+                                          decoration: BoxDecoration(
+                                            color: visual.accent
+                                                .withValues(alpha: 0.14),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            border: Border.all(
+                                              color: visual.accent
+                                                  .withValues(alpha: 0.3),
+                                            ),
+                                          ),
+                                          child: Icon(
+                                            visual.icon,
+                                            color: visual.accent,
+                                            size: 19,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                transaction.description.isEmpty
+                                                    ? transaction.type
+                                                        .capitalize()
+                                                    : transaction.description,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                    ),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                categoryName != null
+                                                    ? '${transaction.date.split('T')[0]} • $categoryName'
+                                                    : transaction.date
+                                                        .split('T')[0],
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurfaceVariant,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            maxWidth:
+                                                (MediaQuery.sizeOf(context)
+                                                            .width *
+                                                        0.38)
+                                                    .clamp(110.0, 160.0)
+                                                    .toDouble(),
+                                          ),
+                                          child: Text(
+                                            '$amountPrefix${currencyFormatter.format(transaction.amount)}',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleSmall
+                                                ?.copyWith(
+                                                  color: amountColor,
+                                                  fontWeight: FontWeight.w800,
+                                                ),
+                                            overflow: TextOverflow.ellipsis,
+                                            textAlign: TextAlign.end,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ),
                             );
                           },

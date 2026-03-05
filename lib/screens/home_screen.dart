@@ -12,6 +12,7 @@ import '../helpers/notification_service.dart';
 import '../models/bill.dart';
 import '../models/transaction.dart' as model;
 import '../theme/app_theme.dart';
+import '../theme/transaction_visuals.dart';
 import 'add_transaction_screen.dart';
 import 'all_transactions_screen.dart';
 import 'add_bill_screen.dart';
@@ -73,8 +74,8 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       await Future.wait([
         _loadCurrencyPreference(),
-        _loadBills(_currentUser!.uid),
-        _loadTransactions(_currentUser!.uid),
+        _loadBills(_currentUser.uid),
+        _loadTransactions(_currentUser.uid),
       ]);
     } catch (e) {
       debugPrint('Error refreshing data: $e');
@@ -437,7 +438,7 @@ class _HomeScreenState extends State<HomeScreen> {
         SummaryCard(
           title: 'Total Income',
           amount: _totalIncome,
-          icon: AppIcons.trending_up,
+          icon: AppIcons.account_balance_wallet,
           color: AppColors.success,
           currencySymbol: _currencySymbol,
         ),
@@ -445,7 +446,7 @@ class _HomeScreenState extends State<HomeScreen> {
         SummaryCard(
           title: 'Total Expenses',
           amount: _totalExpenses,
-          icon: AppIcons.trending_down,
+          icon: AppIcons.receipt_long_outlined,
           color: AppColors.error,
           currencySymbol: _currencySymbol,
         ),
@@ -453,7 +454,7 @@ class _HomeScreenState extends State<HomeScreen> {
         SummaryCard(
           title: 'Available',
           amount: _balance,
-          icon: AppIcons.account_balance,
+          icon: AppIcons.savings,
           color: _balance >= 0 ? AppColors.primary : AppColors.warning,
           currencySymbol: _currencySymbol,
         ),
@@ -582,7 +583,7 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         else
           SizedBox(
-            height: 246,
+            height: 266,
             child: ListView.separated(
               padding: const EdgeInsets.only(top: 8),
               scrollDirection: Axis.horizontal,
@@ -592,6 +593,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 final bill = _bills[index];
                 final styling = _getBillStyling(bill.name);
                 final status = _getBillStatus(bill.dueDate);
+                final dueDateLabel = DateFormat('MMM d').format(bill.dueDate);
+                final isDark = Theme.of(context).brightness == Brightness.dark;
+                final cardStartColor = Color.lerp(
+                      Theme.of(context).colorScheme.surface,
+                      styling.color,
+                      isDark ? 0.2 : 0.1,
+                    ) ??
+                    Theme.of(context).colorScheme.surface;
+                final cardEndColor = Color.lerp(
+                      Theme.of(context).colorScheme.surface,
+                      status.color,
+                      isDark ? 0.12 : 0.06,
+                    ) ??
+                    Theme.of(context).colorScheme.surface;
                 final cardWidth = (MediaQuery.sizeOf(context).width * 0.74)
                     .clamp(250.0, 330.0);
                 final isPaying =
@@ -600,267 +615,413 @@ class _HomeScreenState extends State<HomeScreen> {
                 return SizedBox(
                   width: cardWidth,
                   child: Container(
-                    padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+                    clipBehavior: Clip.antiAlias,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [cardStartColor, cardEndColor],
+                      ),
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(
-                        color: status.color.withValues(alpha: 0.25),
+                        color: status.color.withValues(alpha: 0.35),
                         width: 1.2,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .shadow
-                              .withValues(alpha: 0.14),
-                          blurRadius: 14,
-                          offset: const Offset(0, 8),
+                          color: styling.color.withValues(alpha: 0.2),
+                          blurRadius: 16,
+                          offset: const Offset(0, 9),
                         ),
                       ],
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Stack(
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: styling.color.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(10),
+                        Positioned(
+                          right: -34,
+                          top: -30,
+                          child: Container(
+                            width: 112,
+                            height: 112,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: styling.color.withValues(
+                                alpha: isDark ? 0.22 : 0.12,
                               ),
-                              child: Icon(styling.icon,
-                                  size: 18, color: styling.color),
                             ),
-                            const Spacer(),
-                            if (bill.isRecurring)
-                              Icon(
-                                LucideIcons.repeat,
-                                size: 16,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
+                          ),
+                        ),
+                        Positioned(
+                          left: -38,
+                          bottom: -42,
+                          child: Container(
+                            width: 130,
+                            height: 130,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: status.color.withValues(
+                                alpha: isDark ? 0.16 : 0.09,
                               ),
-                            const SizedBox(width: 4),
-                            PopupMenuButton<String>(
-                              icon: Icon(
-                                LucideIcons.moreVertical,
-                                size: 18,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                              ),
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              onSelected: (value) {
-                                if (value == 'edit') {
-                                  _editBill(bill);
-                                } else if (value == 'delete') {
-                                  _deleteBill(bill);
-                                }
-                              },
-                              itemBuilder: (BuildContext context) => const [
-                                PopupMenuItem<String>(
-                                  value: 'edit',
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        LucideIcons.pencil,
-                                        size: 18,
-                                        color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(9),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          styling.color.withValues(alpha: 0.14),
+                                      borderRadius: BorderRadius.circular(11),
+                                      border: Border.all(
+                                        color: styling.color
+                                            .withValues(alpha: 0.26),
                                       ),
-                                      SizedBox(width: 8),
-                                      Text('Edit'),
-                                    ],
-                                  ),
-                                ),
-                                PopupMenuItem<String>(
-                                  value: 'delete',
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        LucideIcons.trash2,
-                                        size: 18,
-                                        color: AppColors.error,
-                                      ),
-                                      SizedBox(width: 8),
-                                      Text('Delete'),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 14),
-                        Text(
-                          bill.name,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(
-                                fontWeight: FontWeight.w800,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 8),
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            '$_currencySymbol ${NumberFormat('#,##0').format(bill.amount)}',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: status.color.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Text(
-                            status.text,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelSmall
-                                ?.copyWith(
-                                  color: status.color,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                          ),
-                        ),
-                        const Spacer(),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 42,
-                          child: ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.success,
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            onPressed: isPaying
-                                ? null
-                                : () async {
-                                    if (currentUser == null ||
-                                        bill.id == null) {
-                                      return;
-                                    }
-
-                                    setState(() {
-                                      _payingBills.add(bill.id!);
-                                    });
-
-                                    try {
-                                      final billTransaction = model.Transaction(
-                                        type: 'expense',
-                                        amount: bill.amount,
-                                        description: 'Paid bill: ${bill.name}',
-                                        date: DateTime.now().toIso8601String(),
-                                        categoryId:
-                                            await dbHelper.getOrCreateCategory(
-                                          'Bills',
-                                          currentUser.uid,
-                                          type: 'expense',
-                                        ),
-                                      );
-                                      await dbHelper.addTransaction(
-                                          billTransaction, currentUser.uid);
-
-                                      if (bill.isRecurring) {
-                                        final nextDueDate =
-                                            _calculateNextDueDate(bill);
-                                        final updatedBill =
-                                            bill.copyWith(dueDate: nextDueDate);
-
-                                        final notificationService =
-                                            NotificationService();
-                                        await notificationService
-                                            .cancelNotification(bill.id!);
-                                        await notificationService
-                                            .scheduleBillNotification(
-                                                updatedBill);
-
-                                        await dbHelper.updateBill(
-                                            updatedBill, currentUser.uid);
-                                        if (mounted) {
-                                          SnackbarHelper.showSuccess(
-                                            context,
-                                            'Recurring bill "${bill.name}" paid. Next due date set.',
-                                          );
-                                        }
-                                      } else {
-                                        final notificationService =
-                                            NotificationService();
-                                        await notificationService
-                                            .cancelNotification(bill.id!);
-
-                                        await dbHelper.deleteBill(
-                                            bill.id!, currentUser.uid);
-                                        if (mounted) {
-                                          SnackbarHelper.showSuccess(
-                                            context,
-                                            'Bill "${bill.name}" marked as paid.',
-                                          );
-                                        }
-                                      }
-
-                                      _refreshData();
-                                    } catch (e) {
-                                      if (mounted) {
-                                        SnackbarHelper.showError(
-                                          context,
-                                          'Failed to pay bill',
-                                        );
-                                      }
-                                    } finally {
-                                      if (mounted) {
-                                        setState(() {
-                                          _payingBills.remove(bill.id!);
-                                        });
-                                      }
-                                    }
-                                  },
-                            icon: isPaying
-                                ? const SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
                                     ),
-                                  )
-                                : const Icon(LucideIcons.check, size: 18),
-                            label: Text(
-                              isPaying ? 'Processing...' : 'Pay Bill',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelLarge
-                                  ?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700,
+                                    child: Icon(
+                                      styling.icon,
+                                      size: 18,
+                                      color: styling.color,
+                                    ),
                                   ),
-                            ),
+                                  const Spacer(),
+                                  if (bill.isRecurring)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .surface
+                                            .withValues(alpha: 0.78),
+                                        borderRadius:
+                                            BorderRadius.circular(999),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            LucideIcons.repeat,
+                                            size: 12,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurfaceVariant,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            bill.recurrenceType == 'weekly'
+                                                ? 'Weekly'
+                                                : 'Monthly',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .labelSmall
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  const SizedBox(width: 4),
+                                  PopupMenuButton<String>(
+                                    icon: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .surface
+                                            .withValues(alpha: 0.75),
+                                        borderRadius:
+                                            BorderRadius.circular(999),
+                                      ),
+                                      child: Icon(
+                                        LucideIcons.moreVertical,
+                                        size: 16,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
+                                      ),
+                                    ),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    onSelected: (value) {
+                                      if (value == 'edit') {
+                                        _editBill(bill);
+                                      } else if (value == 'delete') {
+                                        _deleteBill(bill);
+                                      }
+                                    },
+                                    itemBuilder: (BuildContext context) =>
+                                        const [
+                                      PopupMenuItem<String>(
+                                        value: 'edit',
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              LucideIcons.pencil,
+                                              size: 18,
+                                              color: AppColors.primary,
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text('Edit'),
+                                          ],
+                                        ),
+                                      ),
+                                      PopupMenuItem<String>(
+                                        value: 'delete',
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              LucideIcons.trash2,
+                                              size: 18,
+                                              color: AppColors.error,
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text('Delete'),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                bill.name,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 8),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .surface
+                                      .withValues(alpha: isDark ? 0.5 : 0.66),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color:
+                                        styling.color.withValues(alpha: 0.25),
+                                  ),
+                                ),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    '$_currencySymbol ${NumberFormat('#,##0').format(bill.amount)}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall
+                                        ?.copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 9),
+                              Row(
+                                children: [
+                                  Icon(
+                                    LucideIcons.calendar,
+                                    size: 14,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Expanded(
+                                    child: Text(
+                                      'Due $dueDateLabel',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelMedium
+                                          ?.copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurfaceVariant,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          status.color.withValues(alpha: 0.13),
+                                      borderRadius: BorderRadius.circular(999),
+                                    ),
+                                    child: Text(
+                                      status.text,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall
+                                          ?.copyWith(
+                                            color: status.color,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const Spacer(),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 42,
+                                child: ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.success,
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  onPressed: isPaying
+                                      ? null
+                                      : () async {
+                                          if (currentUser == null ||
+                                              bill.id == null) {
+                                            return;
+                                          }
+
+                                          setState(() {
+                                            _payingBills.add(bill.id!);
+                                          });
+
+                                          try {
+                                            final billTransaction =
+                                                model.Transaction(
+                                              type: 'expense',
+                                              amount: bill.amount,
+                                              description:
+                                                  'Paid bill: ${bill.name}',
+                                              date: DateTime.now()
+                                                  .toIso8601String(),
+                                              categoryId: await dbHelper
+                                                  .getOrCreateCategory(
+                                                'Bills',
+                                                currentUser.uid,
+                                                type: 'expense',
+                                              ),
+                                            );
+                                            await dbHelper.addTransaction(
+                                                billTransaction,
+                                                currentUser.uid);
+
+                                            if (bill.isRecurring) {
+                                              final nextDueDate =
+                                                  _calculateNextDueDate(bill);
+                                              final updatedBill = bill.copyWith(
+                                                  dueDate: nextDueDate);
+
+                                              final notificationService =
+                                                  NotificationService();
+                                              await notificationService
+                                                  .cancelNotification(bill.id!);
+                                              await notificationService
+                                                  .scheduleBillNotification(
+                                                      updatedBill);
+
+                                              await dbHelper.updateBill(
+                                                  updatedBill, currentUser.uid);
+                                              if (mounted) {
+                                                SnackbarHelper.showSuccess(
+                                                  this.context,
+                                                  'Recurring bill "${bill.name}" paid. Next due date set.',
+                                                );
+                                              }
+                                            } else {
+                                              final notificationService =
+                                                  NotificationService();
+                                              await notificationService
+                                                  .cancelNotification(bill.id!);
+
+                                              await dbHelper.deleteBill(
+                                                  bill.id!, currentUser.uid);
+                                              if (mounted) {
+                                                SnackbarHelper.showSuccess(
+                                                  this.context,
+                                                  'Bill "${bill.name}" marked as paid.',
+                                                );
+                                              }
+                                            }
+
+                                            _refreshData();
+                                          } catch (e) {
+                                            if (mounted) {
+                                              SnackbarHelper.showError(
+                                                this.context,
+                                                'Failed to pay bill',
+                                              );
+                                            }
+                                          } finally {
+                                            if (mounted) {
+                                              setState(() {
+                                                _payingBills.remove(bill.id!);
+                                              });
+                                            }
+                                          }
+                                        },
+                                  icon: isPaying
+                                      ? const SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : const Icon(LucideIcons.check, size: 18),
+                                  label: Text(
+                                    isPaying ? 'Processing...' : 'Pay Bill',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelLarge
+                                        ?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -905,6 +1066,24 @@ class _HomeScreenState extends State<HomeScreen> {
         final isIncome = transaction.type == 'income';
         final amountColor = isIncome ? AppColors.success : AppColors.error;
         final amountPrefix = isIncome ? '+' : '-';
+        final visual = resolveTransactionVisual(
+          type: transaction.type,
+          description: transaction.description,
+        );
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final baseSurface = Theme.of(context).colorScheme.surface;
+        final cardStart = Color.lerp(
+              baseSurface,
+              visual.accent,
+              isDark ? 0.20 : 0.08,
+            ) ??
+            baseSurface;
+        final cardEnd = Color.lerp(
+              baseSurface,
+              amountColor,
+              isDark ? 0.12 : 0.04,
+            ) ??
+            baseSurface;
 
         return Dismissible(
           key: ValueKey(transaction.id),
@@ -959,22 +1138,37 @@ class _HomeScreenState extends State<HomeScreen> {
             margin: const EdgeInsets.only(bottom: 10),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [cardStart, cardEnd],
+              ),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                  color: Theme.of(context).colorScheme.outlineVariant),
+                color: visual.accent.withValues(alpha: isDark ? 0.34 : 0.22),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: visual.accent.withValues(alpha: isDark ? 0.18 : 0.12),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
             ),
             child: Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(9),
                   decoration: BoxDecoration(
-                    color: amountColor.withValues(alpha: 0.12),
+                    color: visual.accent.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: visual.accent.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: Icon(
-                    isIncome ? AppIcons.arrow_downward : AppIcons.arrow_upward,
-                    color: amountColor,
+                    visual.icon,
+                    color: visual.accent,
                     size: 19,
                   ),
                 ),
@@ -1004,6 +1198,27 @@ class _HomeScreenState extends State<HomeScreen> {
                                   .withValues(alpha: 0.8),
                               fontWeight: FontWeight.w600,
                             ),
+                      ),
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: visual.accent.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          visual.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: visual.accent,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                        ),
                       ),
                     ],
                   ),
@@ -1054,46 +1269,99 @@ class SummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final currencyFormatter =
         NumberFormat.currency(locale: 'en_US', symbol: '');
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final baseSurface = Theme.of(context).colorScheme.surface;
+    final startColor = Color.lerp(
+          baseSurface,
+          color,
+          isDark ? 0.20 : 0.1,
+        ) ??
+        baseSurface;
+    final endColor = Color.lerp(
+          baseSurface,
+          color,
+          isDark ? 0.1 : 0.04,
+        ) ??
+        baseSurface;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-        color: Theme.of(context).colorScheme.surface,
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: color, size: 22),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [startColor, endColor],
+        ),
+        border: Border.all(
+          color: color.withValues(alpha: isDark ? 0.34 : 0.22),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: isDark ? 0.16 : 0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            right: -18,
+            top: -18,
+            child: Container(
+              width: 90,
+              height: 90,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: color.withValues(alpha: isDark ? 0.22 : 0.12),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
               children: [
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w700,
-                      ),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: color.withValues(alpha: 0.28),
+                    ),
+                  ),
+                  child: Icon(icon, color: color, size: 22),
                 ),
-                const SizedBox(height: 5),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    '$currencySymbol ${currencyFormatter.format(amount)}',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: color,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant
+                                  .withValues(alpha: 0.86),
+                              fontWeight: FontWeight.w700,
+                            ),
+                      ),
+                      const SizedBox(height: 5),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '$currencySymbol ${currencyFormatter.format(amount)}',
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    color: color,
+                                  ),
                         ),
+                      ),
+                    ],
                   ),
                 ),
               ],
