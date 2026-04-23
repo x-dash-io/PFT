@@ -4,7 +4,7 @@
 /// for image upload and transformation.
 
 class AppConfig {
-  static const String cloudinaryCloudName = 'dn1qpjue4';
-  static const String cloudinaryApiKey = '254165679548423';
-  static const String cloudinaryApiSecret = 'SZPaJo5l2f8v8CsS-9p_IASueKk';
+  static const String cloudinaryCloudName = 'YOUR_CLOUD_NAME';
+  static const String cloudinaryApiKey = 'YOUR_API_KEY';
+  static const String cloudinaryApiSecret = 'YOUR_API_SECRET';
 }

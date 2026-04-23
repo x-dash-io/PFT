@@ -8,6 +8,16 @@
 
 # NEW: Keep rules for Flutter's Google Play Core dependencies
 -keep class com.google.android.play.core.** { *; }
+
+# Firebase / Firestore
+-keep class com.google.firebase.** { *; }
+-keep class com.google.android.gms.** { *; }
+-keep class com.google.common.util.concurrent.ListenableFuture { *; }
+
+# SQLite
+-keep class net.sqlcipher.** { *; }
+-dontwarn net.sqlcipher.**
+
 # Please add these rules to your existing keep rules in order to suppress warnings.
 # This is generated automatically by the Android Gradle plugin.
 -dontwarn com.google.android.play.core.splitcompat.SplitCompatApplication

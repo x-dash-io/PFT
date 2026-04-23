@@ -60,7 +60,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '142893563437',
     projectId: 'ledgerlite-app',
     storageBucket: 'ledgerlite-app.firebasestorage.app',
-    iosBundleId: 'com.example.ledgerlite',
+    iosBundleId: 'com.ledgerlite.app',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -69,6 +69,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '142893563437',
     projectId: 'ledgerlite-app',
     storageBucket: 'ledgerlite-app.firebasestorage.app',
-    iosBundleId: 'com.example.ledgerlite',
+    iosBundleId: 'com.ledgerlite.app',
   );
 }
